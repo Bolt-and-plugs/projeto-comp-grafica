@@ -38,10 +38,13 @@ void clean_app() {
 int main(int argc, char **argv) {
   init_app();
   init_window(600, 400);
+  init_shader_table();
 
   while (!glfwWindowShouldClose(app.window.glfw_window)) {
     glClearColor(0.1f, 0.2f, 0.2f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
+
+    render();
 
     glfwSwapBuffers(app.window.glfw_window);
     glfwPollEvents();

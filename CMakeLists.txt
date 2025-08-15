@@ -34,6 +34,7 @@ FetchContent_Declare(
     GIT_PROGRESS   TRUE
     SOURCE_SUBDIR  cmake
 )
+
 FetchContent_MakeAvailable(glfw glad)
 
 glad_add_library(glad_gl_core_43 STATIC REPRODUCIBLE LOADER API gl:core=4.3)
@@ -65,7 +66,7 @@ target_compile_definitions(${project_name} PRIVATE
 
 target_compile_options(${project_name} PRIVATE
   $<$<CONFIG:DEBUG>:-g3 -O0 -Wall -Wextra -Wpedantic -lm>
-  $<$<CONFIG:RELEAE>:-m>
+  $<$<CONFIG:RELEAE>:-lm>
 )
 
 if(NOT WIN32)
