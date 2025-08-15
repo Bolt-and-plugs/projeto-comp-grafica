@@ -43,9 +43,8 @@ int main(int argc, char **argv) {
   while (!glfwWindowShouldClose(app.window.glfw_window)) {
     glClearColor(0.1f, 0.2f, 0.2f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
-
+    glUseProgram(app.st.program);
     render();
-
     glfwSwapBuffers(app.window.glfw_window);
     glfwPollEvents();
   }

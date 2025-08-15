@@ -16,6 +16,7 @@ typedef struct __shader {
 typedef struct __shader_table {
   shader *entries[MAX_SHADER_NUM];
   int len;
+  GLuint program;
 } shader_table;
 
 void init_shader_table();

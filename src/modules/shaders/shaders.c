@@ -50,12 +50,12 @@ static GLuint compile_shader(GLenum type, const char *source) {
   return shader;
 }
 
-// TODO upscale this create_shader_program for n shaders
-static GLuint create_shader_program(GLuint vertexShader,
-                                    GLuint fragmentShader) {
+static GLuint create_shader_program() {
   GLuint program = glCreateProgram();
-  glAttachShader(program, vertexShader);
-  glAttachShader(program, fragmentShader);
+  for (int i = 0; i < app.st.len; i++) {
+    glAttachShader(program, app.st.entries[i]->shader);
+  }
+
   glLinkProgram(program);
 
   GLint success;
@@ -120,9 +120,8 @@ shader *get_shader_from_filename(const char *filename) {
 void print_shader(shader *s) { c_info("%s %d", s->name, s->shader); }
 
 void print_all_shaders() {
-  for (int i = 0; i < app.st.len; i++) {
+  for (int i = 0; i < app.st.len; i++)
     print_shader(app.st.entries[i]);
-  }
 }
 
 bool insert_into_shader_table(shader *s) {
@@ -147,4 +146,5 @@ void init_shader_table() {
   };
 
   print_all_shaders();
+  app.st.program = create_shader_program();
 }
