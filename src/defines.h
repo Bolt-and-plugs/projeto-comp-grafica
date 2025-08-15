@@ -1,13 +1,16 @@
 #ifndef _DEFINES
 #define _DEFINES
 
-#include <pthread.h>
-#include <semaphore.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#define GLFW_INCLUDE_NONE
+#include <GLFW/glfw3.h>
+#include <glad/gl.h>
+
 #ifdef __linux__
 #include <sys/wait.h>
 #endif

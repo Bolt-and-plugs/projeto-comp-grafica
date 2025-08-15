@@ -22,10 +22,31 @@ void set_debug_mode() {
   app.min_log_level = get_min_log_level();
 }
 
-int main(int argc, char **argv) {
+void init_app() {
   set_debug_mode();
-  
-  // main here
 
+  char *name = malloc(32);
+  strcpy(name, "Titulo");
+  app.name = name;
+}
+
+void clean_app() {
+  glfwDestroyWindow(app.window.glfw_window);
+  glfwTerminate();
+}
+
+int main(int argc, char **argv) {
+  init_app();
+  init_window(600, 400);
+
+  while (!glfwWindowShouldClose(app.window.glfw_window)) {
+    glClearColor(0.1f, 0.2f, 0.2f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    glfwSwapBuffers(app.window.glfw_window);
+    glfwPollEvents();
+  }
+
+  clean_app();
   return 0;
 }
