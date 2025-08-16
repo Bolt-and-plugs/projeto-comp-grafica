@@ -2,6 +2,7 @@
 #define _OBJ
 
 #include "defines.h"
+#include "../texture/texture.h"
 
 #define DEFAULT_BUFFER_SIZE 128
 
@@ -17,10 +18,11 @@ typedef struct __face {
 } face;
 
 typedef struct __obj {
-  DynamicArray *vertecies; // v -> vertices (x, y, z, -- optional -- w)
-  DynamicArray *normals;   // List of vertex normals in (x,y,z) form;
+  DynamicArray *vertecies; // v -> vertices (x, y, z, (w - optional))
+  DynamicArray *normals;   // vn -> List of vertex normals in (x,y,z) form
   DynamicArray *textures;  // vt ->textures coord (u, [v, w])
-  DynamicArray *faces;     // combining all above
+  DynamicArray *faces;     // f -> combining all above with their idx
+  texture texture;
 } obj;
 
 obj *load_model(const char *path);

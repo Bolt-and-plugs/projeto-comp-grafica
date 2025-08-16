@@ -44,10 +44,12 @@ find_package(OpenGL REQUIRED)
 
 file(GLOB SRC_FILES src/*.c)
 file(GLOB PROJECT_MODULES src/modules/*/*.c)
+file(GLOB VENDOR vendor/*/*.c)
 
 add_executable(${project_name}
   ${SRC_FILES}
   ${PROJECT_MODULES}
+  ${VENDOR}
 )
 
 target_link_libraries(${project_name} PRIVATE
@@ -58,6 +60,7 @@ target_link_libraries(${project_name} PRIVATE
 
 target_include_directories(${project_name} PRIVATE
   "${CMAKE_CURRENT_SOURCE_DIR}/src"
+  "${CMAKE_CURRENT_SOURCE_DIR}/vendor"
 )
 
 target_compile_definitions(${project_name} PRIVATE

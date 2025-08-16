@@ -1,4 +1,4 @@
-// Note: this is not a real parser, probably it will fail
+// Note: this is not a real parser, probably it will fail for different obj
 // Im onlying writing this to have some fun
 #include "obj_parser.h"
 #include "../logger/log.h"

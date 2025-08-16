@@ -1,7 +1,7 @@
 #ifndef _WINDOW
 #define _WINDOW
 
-#include "defines.h"
+#include "../../defines.h"
 #include "../render/render.h"
 
 typedef struct __window {

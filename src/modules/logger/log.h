@@ -1,7 +1,6 @@
 #ifndef _LOG
 #define _LOG
 
-#include "../../defines.h"
 #include <stdarg.h>
 
 typedef enum { DEBUG, INFO, WARN, ERROR, CRIT_ERROR } log_level;
@@ -19,6 +18,7 @@ typedef enum {
   MODEL_PARSING_ERROR = 500,
   INVALID_INPUT = 600,
   INVALID_ARGS = 601,
+  TEXTURE_LOADING_ERROR = 701,
 
 } status_code;
 

@@ -2,7 +2,6 @@
 
 App app;
 
-
 bool set_envvar(const char *mode) {
   if (strcmp(mode, "Debug") == 0 || strcmp(mode, "DEBUG") == 0) {
     app.debug = true;
@@ -31,8 +30,6 @@ void init_app() {
   app.name = name;
 }
 
-static const Vertex3f vertices[3] = {{-0.6f, -0.4f, 0.f}, {0.6f, -0.4f, 0.f}, {0.6f, 0.6f, 0.f}};
-
 void clean_app() {
   glfwDestroyWindow(app.window.glfw_window);
   glfwTerminate();
@@ -43,6 +40,9 @@ int main(int argc, char **argv) {
   init_window(600, 400);
   init_shader_table();
 
+  obj *cube = load_model("assets/models/Cube.obj");
+  cube->texture.idx = load_texture("assets/textures/default_texture_1.jpg");
+
   // todo remove this VBO (vertex buffer obj) and VAO (vertex array) shit
   GLuint VBO, VAO;
   glGenVertexArrays(1, &VAO);
@@ -50,22 +50,31 @@ int main(int argc, char **argv) {
 
   glBindVertexArray(VAO);
   glBindBuffer(GL_ARRAY_BUFFER, VBO);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(cube->vertecies) / sizeof(Vertex3f),
+               cube->vertecies, GL_STATIC_DRAW);
 
   const GLint vpos_location = glGetAttribLocation(app.st.program, "aPos");
-  if (vpos_location == -1) {
-    fprintf(stderr, "ERROR: Could not find attribute 'aPos' in shader!\n");
-  }
+  const GLint vtexture_location =
+      glGetAttribLocation(app.st.program, "aTexCoord");
+
+  if (vpos_location == -1)
+    c_error(SHADER_LOAD_ERROR, "Could not find attribute 'aPos' in shader!\n");
+
+  if (vtexture_location == -1)
+    c_error(SHADER_LOAD_ERROR, "Could not find attribute 'aTex' in shader!\n");
 
   // Tell OpenGL how to interpret the vertex data in the VBO.
   glVertexAttribPointer(vpos_location, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex3f),
                         (void *)offsetof(Vertex3f, pos));
   glEnableVertexAttribArray(vpos_location);
+  glEnableVertexAttribArray(2);
 
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindVertexArray(0);
 
-  obj *cube = load_model("assets/models/Cube.obj");
+  glBindTexture(GL_TEXTURE_2D, cube->texture.idx);
+  glBindVertexArray(VAO);
+  glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
   while (!glfwWindowShouldClose(app.window.glfw_window)) {
     int width, height;
@@ -73,7 +82,6 @@ int main(int argc, char **argv) {
     glViewport(0, 0, width, height);
     glClearColor(1.f, 1.f, 1.f, 1.f);
     glClear(GL_COLOR_BUFFER_BIT);
-
     glUseProgram(app.st.program);
 
     glBindVertexArray(VAO);

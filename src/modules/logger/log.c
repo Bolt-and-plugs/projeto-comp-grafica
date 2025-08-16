@@ -1,4 +1,5 @@
 #include "log.h"
+#include "../../defines.h"
 #include "../../app.h"
 #include "../utils/utils.h"
 
