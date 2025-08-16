@@ -4,7 +4,7 @@
 
 extern App app;
 
-char *shader_list[] = {"assets/default.vert", "assets/default.frag"};
+char *shader_list[] = {"assets/shaders/default.vert", "assets/shaders/default.frag"};
 size_t shader_len = sizeof(shader_list) / sizeof(shader_list[0]);
 
 static char *read_shader_file(const char *filename) {
@@ -52,6 +52,7 @@ static GLuint compile_shader(GLenum type, const char *source) {
 
 static GLuint create_shader_program() {
   GLuint program = glCreateProgram();
+
   for (int i = 0; i < app.st.len; i++) {
     glAttachShader(program, app.st.entries[i]->shader);
   }
@@ -68,6 +69,8 @@ static GLuint create_shader_program() {
     glDeleteProgram(program);
     return 0;
   }
+
+  c_info("Shader Program created");
   return program;
 }
 
@@ -139,12 +142,15 @@ bool load_shaders() {
 }
 
 void init_shader_table() {
+  c_info("Initializing Shader Table");
   app.st.len = 0;
   if (!load_shaders()) {
     c_error(SHADER_LOAD_ERROR,
             "Could not initialize shader table with %d entries", shader_len);
   };
 
-  print_all_shaders();
+  if (app.debug)
+    print_all_shaders();
+
   app.st.program = create_shader_program();
 }

@@ -6,6 +6,7 @@
 #include "modules/render/render.h"
 #include "modules/shaders/shaders.h"
 #include "modules/shaders/shaders.h"
+#include "modules/obj_parser/obj_parser.h"
 
 typedef struct __App {
   const char *name;
