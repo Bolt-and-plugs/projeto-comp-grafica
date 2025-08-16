@@ -7,6 +7,7 @@
 
 typedef struct __texture {
   u32 idx;
+  vec2f coord;
 } texture;
 
 typedef struct __texture_map {
