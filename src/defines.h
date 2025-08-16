@@ -14,10 +14,10 @@
 #ifdef __linux__
 #include <sys/wait.h>
 #endif
+#include "modules/utils/dynamic_array.h"
+#include "modules/utils/vertex/vertex.h"
 #include <time.h>
 #include <unistd.h>
-#include "modules/utils/vertex/vertex.h"
-#include "modules/utils/dynamic_array.h"
 
 typedef uint8_t u8;
 typedef uint16_t u16;

@@ -51,11 +51,8 @@ int darray_push(DynamicArray *array, const void *element) {
       return -1;
 
   void *dest = (char *)array->data + (array->size * array->element_size);
-
   memcpy(dest, element, array->element_size);
-
   array->size++;
-
   return 0;
 }
 
