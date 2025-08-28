@@ -6,7 +6,6 @@
 #include "modules/render/render.h"
 #include "modules/shaders/shaders.h"
 #include "modules/shaders/shaders.h"
-#include "modules/obj_parser/obj_parser.h"
 #include "modules/texture/texture.h"
 
 typedef struct __App {

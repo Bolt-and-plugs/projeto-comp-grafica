@@ -40,8 +40,11 @@ int main(int argc, char **argv) {
   init_window(600, 400);
   init_shader_table();
 
-  obj *cube = load_model("assets/models/Cube.obj");
-  cube->texture.idx = load_texture("assets/textures/default_texture_1.jpg");
+  Vertex3f vertex[4][3] = {
+      {{0.45f, .1f, 0.1f}, {0.45f, .1f, 0.1f}, {0.45f, .1f, 0.1f}},
+      {{0.45f, .1f, 0.1f}, {0.45f, .1f, 0.1f}, {0.45f, .1f, 0.1f}},
+      {{0.45f, .1f, 0.1f}, {0.45f, .1f, 0.1f}, {0.45f, .1f, 0.1f}},
+      {{0.45f, .1f, 0.1f}, {0.45f, .1f, 0.1f}, {0.45f, .1f, 0.1f}}};
 
   // todo remove this VBO (vertex buffer obj) and VAO (vertex array) shit
   GLuint VBO, VAO;
@@ -50,10 +53,11 @@ int main(int argc, char **argv) {
 
   glBindVertexArray(VAO);
   glBindBuffer(GL_ARRAY_BUFFER, VBO);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(cube->vertecies) / sizeof(Vertex3f),
-               cube->vertecies, GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(vertex) / sizeof(Vertex3f), vertex,
+               GL_STATIC_DRAW);
 
   const GLint vpos_location = glGetAttribLocation(app.st.program, "aPos");
+
   const GLint vtexture_location =
       glGetAttribLocation(app.st.program, "aTexCoord");
 
@@ -72,8 +76,6 @@ int main(int argc, char **argv) {
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindVertexArray(0);
 
-  glBindTexture(GL_TEXTURE_2D, cube->texture.idx);
-  glBindVertexArray(VAO);
   glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
   while (!glfwWindowShouldClose(app.window.glfw_window)) {
