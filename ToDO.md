@@ -1,36 +1,33 @@
 # sessoes 
 
+Trabalho de computação gráfica focado em físicas e simulações.
 - [ ] introducao
-    - historia
+    - historia 
     - curiosidades 
-    - pessoas notaveis
+    - pessoas e eventos notaveis
 - [ ] justificativa
+    - por que escolher renderizar nuvens volumetricas?
+- [ ] objetivos
 - [ ] fundamentacao teorica
+    - pesquisar tecnicas de renderizacao de nuvens volumetricas, assim como algoritmos de geracao procedural de terrenos (possivelmente)
 - [ ] projeto/metodologia
 - [ ] resultados
 - [ ] discussao
+    - vale a pena tentar implementar em C com opengl? ou melhor focar em unity?
+- [ ] conclusao
 
 ---
 
 # tema
 
 `possiveis temas:`  
-- geracao de terrenos fractais
-- erosao (fluido + terra) simulada proceduralmente
-- simulacao de liquido em tempo real
-- sistema solar (por exemplo)
-    - buraco negro
-- acelerador de particulas
-- nuvens (ou fumaca) volumetricas
-- folhagem e simulacao de vento sla
-- Luz, Óptica e Técnicas de Renderização
-- Simulação de Corpos Rígidos: Colisão, Impulso e Estabilidade
-- Simulação de Tecidos (Cloth Simulation)
-- Simulador de particulas
+- Nuvens (ou fumaça) Volumetricas;
+- Geração Procedural de Terrenos;
+- Simulacao de Fluidos;
+- Simulação de Corpos Rígidos: Colisão, Impulso e Estabilidade;
+- Simulador de particulas.
 
-`decidido:` 
-
+`decidido:` nuvens volumetricas e talvez algum terreno eventualmente.
 
 # Stack
-- fazer do 0 em opengl?? 
-- unity/godot/unreal sla (mentira unreal n)
+- unity inicialmente, depois tentar implementar em C com opengl.
