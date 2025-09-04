@@ -2,14 +2,14 @@
 
 Trabalho de computação gráfica focado em físicas e simulações.
 - [ ] introducao
-    - historia 
+    - historia - tudo sobre fisica e computação gráfica
     - curiosidades 
     - pessoas e eventos notaveis
+- [ ] fundamentacao teorica
+    - tecnicas de renderizacao genericas relacionados a fisica
+    - pesquisar tecnicas de renderizacao de nuvens volumetricas, assim como algoritmos de geracao procedural de terrenos (possivelmente)
 - [ ] justificativa
     - por que escolher renderizar nuvens volumetricas?
-- [ ] objetivos
-- [ ] fundamentacao teorica
-    - pesquisar tecnicas de renderizacao de nuvens volumetricas, assim como algoritmos de geracao procedural de terrenos (possivelmente)
 - [ ] projeto/metodologia
 - [ ] resultados
 - [ ] discussao
@@ -21,13 +21,13 @@ Trabalho de computação gráfica focado em físicas e simulações.
 # tema
 
 `possiveis temas:`  
-- Nuvens (ou fumaça) Volumetricas;
+- Nuvens Volumetricas;
 - Geração Procedural de Terrenos;
 - Simulacao de Fluidos;
 - Simulação de Corpos Rígidos: Colisão, Impulso e Estabilidade;
 - Simulador de particulas.
 
-`decidido:` nuvens volumetricas e talvez algum terreno eventualmente.
+`decidido:` 
 
 # Stack
 - unity inicialmente, depois tentar implementar em C com opengl.
