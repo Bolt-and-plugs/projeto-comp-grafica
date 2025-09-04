@@ -4,5 +4,5 @@ modelagem de forma (lifetime de particulas):
 - Mapas de Ruído 3D
 
 modelagem de textura (shading)
-- ray marching
+- Ray Marching
 - Light Scattering 
