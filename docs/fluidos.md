@@ -1,5 +1,4 @@
 documentos a serem analisados:
-
 [particle-based fluid sim](https://matthias-research.github.io/pages/publications/sca03.pdfhttps://matthias-research.github.io/pages/publications/sca03.pdf). 
 
 [Real-Time Fluid Dynamics for Games](https://www.dgp.toronto.edu/public_user/stam/reality/Research/pdf/GDC03.pdf)
