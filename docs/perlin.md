@@ -1,5 +1,5 @@
-Referência: "An Image Synthetizer" de Ken Perlin: Nesse paper ele sugeriu sobre a técnica de "Pixel Streaming", como é um paper um pouco antigo, 
-acredito que isso deva ter em toda engine que a gente for usar atualmente. Algumas fundamentações são bem parecidas com o que temos em OpenGL, com as funções espaciais (x,y) ou (x,y,z). //Comentários off topic.
+Referência: "An Image Synthetizer" de Ken Perlin: Nesse paper ele sugeriu sobre a técnica de "Pixel Streaming", como é um paper um pouco antigo, acredito que isso deva ter em toda engine que a gente for usar atualmente. Algumas fundamentações são bem parecidas com o que temos em OpenGL, com as funções espaciais (x,y) ou (x,y,z). //Comentários off topic.
+
 //Tudo aqui comentado deve ser interpretado direcionando a aplicação para pixel.
 ## Mapeamento de Texturas
 
@@ -21,16 +21,20 @@ A partir disso, se [x,y,z] está neste set de inteiros, é definido o Noise([x,y
 Com estas definições, supondo um vetor aleatório array, e que ele representa um Donut 
 
 color = white * Noise(array), com a aplicação desta "transformada" foi possível criar essas ondulações no donut com as texturas brancas, de forma aleatória.
+
 <img width="392" height="288" alt="image" src="https://github.com/user-attachments/assets/6c8e230e-085e-4847-af3c-1380b8e5f99e" />
 
 color = Colorful(Noise(k * array)) outro possível exemplo de aplicação, 
+
 <img width="380" height="272" alt="image" src="https://github.com/user-attachments/assets/afdd513c-70ee-4efd-a93c-fb982e565e3e" />
 
 <img width="382" height="272" alt="image" src="https://github.com/user-attachments/assets/a048363d-533e-4d24-abb5-a3314908bb5b" />
+
 Outra técnica seria o vetor diferencial do Noise(), que é definido pela taxa de variação instantânea do "ruído" através das três direções, chamados de Dnoise().
 A partir desta aplicação fica possível criar outros tipos de perturbação, originando novas superfícies e texturas. 
 
 normal + = Dnoise(array) 
+
 <img width="395" height="298" alt="image" src="https://github.com/user-attachments/assets/6420daf3-f461-41c9-9a3d-beaa517c8525" />
 
 

@@ -1,6 +1,5 @@
 documentos a serem analisados:
 [particle-based fluid sim](https://matthias-research.github.io/pages/publications/sca03.pdfhttps://matthias-research.github.io/pages/publications/sca03.pdf). 
-
 [Real-Time Fluid Dynamics for Games](https://www.dgp.toronto.edu/public_user/stam/reality/Research/pdf/GDC03.pdf)
 [gpu-gems-water](https://developer.nvidia.com/gpugems/gpugems/part-vi-beyond-triangles/chapter-38-fast-fluid-dynamics-simulation-gpu)
 
@@ -19,16 +18,6 @@ $$
 Uma explicação simples: a equação de Navier-Stokes descreve como o movimento de um fluido é influenciado pela pressão, viscosidade e forças externas. Nela, $\rho$ é a densidade do fluido, $\mathbf{v}$ é o vetor velocidade, $p$ é a pressão, $\mu$ é o coeficiente de viscosidade, e $\mathbf{f}$ representa forças externas (como gravidade). Ela permite calcular como o fluido se move e se comporta em diferentes situações.
 
 [Para quem quiser se aprofundar](https://pt.wikipedia.org/wiki/Equa%C3%A7%C3%B5es_de_Navier-Stokes).
-
-a technique for modeling a class of fuzzy objects. Since then
-both, the particle-based Lagrangian approach and the grid-
-based Eulerian approach have been used to simulate fluids
-in computer graphics. Desbrun and Cani2 and Tonnesen22
-use particles to animate soft objects. Particles have also been
-used to animate surfaces7 , to control implicit surfaces23 and
-to animate lava flows20 . In recent years the Eulerian ap-
-proach has been more popular as for the simulation of fluids
-in general18 , water 4, 3, 21 , soft objects 14 and melting effects1 .
 
 Em 1983, T. Reeves \cite{reeves1983} introduziu sistemas de partículas como uma técnica para modelar uma classe de objetos difusos. Desde então, tanto a abordagem Lagrangiana baseada em partículas quanto a abordagem Euleriana baseada em grades têm sido usadas para simular fluidos em computação gráfica. Desbrun e Cani \cite{desbrun1996} e Tonnesen \cite{tonnesen1998} utilizam partículas para animar objetos macios. As partículas também foram usadas para animar superfícies \cite{witkin1991}, controlar superfícies implícitas \cite{bloomenthal1997} e animar fluxos de lava \cite{carlson2002}. Nos últimos anos, a abordagem Euleriana tem sido mais popular para a simulação de fluidos em geral \cite{fedkiw2001}, água \cite{stam1999, foster1996, enright2002}, objetos macios \cite{muller2002} e efeitos de derretimento \cite{carlson2002}.
 
@@ -59,8 +48,6 @@ $$
 onde $\mu$ é o coeficiente de viscosidade e $\mathbf{v}_i$, $\mathbf{v}_j$ são as velocidades das partículas.
 
 Essas fórmulas permitem calcular as forças que atuam sobre cada partícula, resultando em simulações de líquidos realistas e eficientes para aplicações interativas.
-
-
 
 
 ## Referências
