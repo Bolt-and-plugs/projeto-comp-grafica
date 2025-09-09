@@ -1,0 +1,68 @@
+\begin{thebibliography}{10}
+
+\bibitem{bloomenthal1997}
+Jules Bloomenthal.
+\newblock {\em Introduction to Implicit Surfaces}.
+\newblock Morgan Kaufmann, 1997.
+
+\bibitem{carlson2002}
+Mark Carlson, Peter~J. Mucha, Robert Van~Horn, and Dimitris Metaxas.
+\newblock Melting and flowing.
+\newblock In {\em ACM SIGGRAPH/Eurographics Symposium on Computer Animation}, 2002.
+
+\bibitem{desbrun1996}
+Mathieu Desbrun and Marie-Paule Cani.
+\newblock Smoothed particles: A new paradigm for animating highly deformable bodies.
+\newblock In {\em Eurographics Workshop on Computer Animation and Simulation}, 1996.
+
+\bibitem{dyson2012turing}
+George Dyson.
+\newblock Turing's cathedral: The origins of the digital universe.
+\newblock {\em Nature}, 482(7386):461--462, 2012.
+
+\bibitem{enright2002}
+Doug Enright, Ronald Fedkiw, Joel Ferziger, and Ian Mitchell.
+\newblock Animation and rendering of complex water surfaces.
+\newblock {\em ACM Transactions on Graphics}, 21(3):736--744, 2002.
+
+\bibitem{fedkiw2001}
+Ronald Fedkiw, Jos Stam, and Henrik~Wann Jensen.
+\newblock Visual simulation of smoke.
+\newblock In {\em SIGGRAPH 2001}, 2001.
+
+\bibitem{foster1996}
+Nick Foster and Dimitris Metaxas.
+\newblock Realistic animation of liquids.
+\newblock {\em Graphical Models and Image Processing}, 58(5):471--483, 1996.
+
+\bibitem{muller2002}
+Matthias Müller, Julie Dorsey, Leonard McMillan, Robert Jagnow, and Barbara Cutler.
+\newblock Stable real-time deformations.
+\newblock In {\em ACM SIGGRAPH/Eurographics Symposium on Computer Animation}, 2002.
+
+\bibitem{fractalNoise}
+Ken Perlin.
+\newblock An image synthesizer.
+\newblock {\em ACM SIGGRAPH Computer Graphics}, 19(3):287--296, 1985.
+
+\bibitem{reeves1983}
+William~T. Reeves.
+\newblock Particle systems—a technique for modeling a class of fuzzy objects.
+\newblock {\em ACM Transactions on Graphics}, 2(2):91--108, 1983.
+
+\bibitem{stam1999}
+Jos Stam.
+\newblock Stable fluids.
+\newblock In {\em SIGGRAPH 99}, 1999.
+
+\bibitem{tonnesen1998}
+Dan Tonnesen.
+\newblock {\em Dynamically coupled particle systems for geometric modeling, reconstruction, and motion simulation}.
+\newblock PhD thesis, University of Copenhagen, 1998.
+
+\bibitem{witkin1991}
+Andrew Witkin and Michael Kass.
+\newblock Reaction-diffusion textures.
+\newblock In {\em SIGGRAPH '91}, 1991.
+
+\end{thebibliography}
