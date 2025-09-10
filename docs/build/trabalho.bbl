@@ -55,6 +55,12 @@ Jos Stam.
 \newblock Stable fluids.
 \newblock In {\em SIGGRAPH 99}, 1999.
 
+\bibitem{Stam2003}
+Jos Stam.
+\newblock Real-time fluid dynamics for games.
+\newblock In {\em Proceedings of the Game Developer Conference}, March 2003.
+\newblock CDROM/PDF.
+
 \bibitem{tonnesen1998}
 Dan Tonnesen.
 \newblock {\em Dynamically coupled particle systems for geometric modeling, reconstruction, and motion simulation}.

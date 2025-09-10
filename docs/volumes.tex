@@ -1,13 +1,46 @@
-\section{Volumes}
-modelagem de forma (lifetime de particulas):
+\section{Volumes (baseado em particulas)}
+\label{sec:volumes}
+
+Os volumes serão abordados aqui de 2 formas, modelagem de forma e shading.
+
+\subsection{Modelagem de forma}
+No geral, ao se computar campos de particulas, espera-se que todas elas tenham seu \textit{lifetime} bem definido para que se possa modelar de maneira precisa o seu comportamento. No entanto, em tempo real, esse trabalho se torna muito custoso, especialmente para volumes que representam fumaca ou folhas ou ate mesmo agua. O movimento desses elementos passa a ser calculado, entao, convertendo as velocidades que circulam o objeto em forcas de corpo. Vemos que poeira simplesmente pode ser modelada sendo carregada pelo vetor de velocidades, sem qualquer resistência significativa. Entretanto, no caso da fumaça, as particulas são substituidas por uma densidade de particulas que aproximam a quantidade delas presentes (normalmente um valor entre 0 e 1). Essa descrição é dada por essa função (conhecida como equação de advecção-difusão): 
+
+$$
+\frac{\partial \rho}{\partial t} = - (u \cdot \nabla) \rho + D \nabla^2 \rho + S
+$$
+
+Onde $u$ é o campo de velocidades, $D$ é o coeficiente de difusão e $S$ é a fonte de particulas. A equação de advecção-difusão pode ser resolvida numericamente usando métodos como diferenças finitas ou volumes finitos. Esses métodos envolvem a discretização do domínio em uma grade e a atualização dos valores da densidade em cada célula da grade ao longo do tempo com base na equação diferencial parcial \cite{Stam2003}.
+
+Esse cálculo normalmente é atribuido a um grid (matriz) bidimensional ou tridimensional, onde cada célula da grade armazena informações sobre a densidade de particulas, velocidade e outras propriedades relevantes. A resolução da grade afeta diretamente a precisão e o custo computacional da simulação. Grades mais finas proporcionam maior detalhe, mas exigem mais memória e poder de processamento.
+
+O método linear proposto por Stam at al \cite{Stam2003} inicia-se com algum estado para a velocidade e densidade e, então, atualiza seus valores baseado em eventos externos (forças, fonte de energia, fontes de particulas e etc.). A cada passo de tempo, o método segue três etapas principais, passando pela equação de advecção-difusão de maneira "inversa", começando do termo final e indo para o inicial:
+
 \begin{itemize}
-\item Ruído Procedural
-\item Mapas de Ruído 3D
+  \item Primeiro termo (Source/Fonte): Adiciona densidade ao sistema baseado em fontes externas. Isso pode incluir a adição de fumaça de uma chaminé ou a introdução de calor em uma área específica.
+  \item Segundo termo (Diffusion/Difusão): Simula a dispersão da densidade ao longo do tempo (se $D > 0$). Uma possível implementação é usar o método de Gauss-Seidel para resolver a equação de difusão, dada por 
+    $$
+    x_{k+1} = x_k + a \nabla^2 x_{k+1}
+    $$
+    onde $a$ é uma constante que depende do coeficiente de difusão e do passo de tempo.
+  \item Terceiro termo (Advection/Advecção): Podemos modelar o centro de cada célula da grade como se fosse uma particula que se move baseada na velocidade do campo. Assim, a densidade é transportada ao longo do campo de velocidades. Entretanto, temos que converter novamente as particulas para a celula proveniente. Uma maneira de fazer isso é usando o método de traçado de linha (backtrace), onde cada célula da grade é atualizada com a densidade da célula de onde a particula veio, baseado na velocidade do campo, ou seja, nos tracamos a linha de volta. Esse método é conhecido como "semi-Lagrangian advection" e é estável para grandes passos de tempo.
+
 \end{itemize}
 
-Modelagem de textura (shading)
+O codigo no final vai ter essa cara:
+\begin{lstlisting}[language=C]
+void dens_step ( int N, float * x, float * x0, float * u, float * v, float diff, float dt ) {
+  add_source ( N, x, x0, dt );
+  SWAP ( x0, x ); diffuse ( N, 0, x, x0, diff, dt );
+  SWAP ( x0, x ); advect ( N, 0, x, x0, u, v, dt );
+}
+\end{lstlisting}
+
+\subsection{Shading}
 \begin{itemize}
   \item Ray Marching
   \item Light Scattering 
   \item SDF
 \end{itemize}
+
+
