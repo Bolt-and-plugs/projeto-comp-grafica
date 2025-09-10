@@ -1,7 +1,7 @@
 \section{Volumes (baseado em particulas)}
 \label{sec:volumes}
 
-Os volumes serão abordados aqui de 2 formas, modelagem de forma e shading.
+Volumes em geral podem ser descritos de diversas maneiras, dentre elas, campos de particulas, campos de voxels, SDFs, entre outros. Os volumes serão abordados aqui de 2 formas, modelagem de forma e shading, de maneira a se melhor representar volumes como fumaça, fogo, agua, poeira, folhas, etc.
 
 \subsection{Modelagem de forma}
 No geral, ao se computar campos de particulas, espera-se que todas elas tenham seu \textit{lifetime} bem definido para que se possa modelar de maneira precisa o seu comportamento. No entanto, em tempo real, esse trabalho se torna muito custoso, especialmente para volumes que representam fumaca ou folhas ou ate mesmo agua. O movimento desses elementos passa a ser calculado, entao, convertendo as velocidades que circulam o objeto em forcas de corpo. Vemos que poeira simplesmente pode ser modelada sendo carregada pelo vetor de velocidades, sem qualquer resistência significativa. Entretanto, no caso da fumaça, as particulas são substituidas por uma densidade de particulas que aproximam a quantidade delas presentes (normalmente um valor entre 0 e 1). Essa descrição é dada por essa função (conhecida como equação de advecção-difusão): 
@@ -14,6 +14,7 @@ Onde $u$ é o campo de velocidades, $D$ é o coeficiente de difusão e $S$ é a 
 
 Esse cálculo normalmente é atribuido a um grid (matriz) bidimensional ou tridimensional, onde cada célula da grade armazena informações sobre a densidade de particulas, velocidade e outras propriedades relevantes. A resolução da grade afeta diretamente a precisão e o custo computacional da simulação. Grades mais finas proporcionam maior detalhe, mas exigem mais memória e poder de processamento.
 
+\subsubsection{Passo de Densidade}
 O método linear proposto por Stam at al \cite{Stam2003} inicia-se com algum estado para a velocidade e densidade e, então, atualiza seus valores baseado em eventos externos (forças, fonte de energia, fontes de particulas e etc.). A cada passo de tempo, o método segue três etapas principais, passando pela equação de advecção-difusão de maneira "inversa", começando do termo final e indo para o inicial:
 
 \begin{itemize}
@@ -29,18 +30,140 @@ O método linear proposto por Stam at al \cite{Stam2003} inicia-se com algum est
 
 O codigo no final vai ter essa cara:
 \begin{lstlisting}[language=C]
-void dens_step ( int N, float * x, float * x0, float * u, float * v, float diff, float dt ) {
-  add_source ( N, x, x0, dt );
-  SWAP ( x0, x ); diffuse ( N, 0, x, x0, diff, dt );
-  SWAP ( x0, x ); advect ( N, 0, x, x0, u, v, dt );
+void dens_step(int N, float *x, float *x0, 
+float *u, float *v, float diff, float dt) {
+  add_source (N, x, x0, dt);
+  SWAP(x0, x); diffuse (N, 0, x, x0, diff, dt);
+  SWAP(x0, x); advect (N, 0, x, x0, u, v, dt);
 }
 \end{lstlisting}
 
+\subsubsection{Passo de Velocidade}
+O passo de velocidade é similar ao passo de densidade, mas com algumas diferenças importantes. Podemos dizer que a velocidade do campo se altera de 3 maneiras distintas: forças externas, difusão e advecção própria (ou auto-advecção - no qual o campo move a si mesmo). O código desta etapa pode ser escrito como:
+
+\begin{lstlisting}[language=C]
+void vel_step(int N, fl oat *u, float *v, 
+float *u0, float *v0, float visc, float dt) {
+  add_source(N, u, u0, dt); add_source(N, v, v0, dt);
+  SWAP(u0, u); diffuse(N, 1, u, u0, visc, dt);
+  SWAP(v0, v); diffuse(N, 2, v, v0, visc, dt);
+  project(N, u, v, u0, v0);
+  SWAP(u0, u); SWAP( v0, v);
+  advect(N, 1, u, u0, u0, v0, dt);
+  advect(N, 2, v, v0, u0, v0, dt);
+  project(N, u, v, u0, v0);
+}
+\end{lstlisting}
+
+Note que temos um novo procedimento neste passo chamado \texttt{project}, que é responsável por garantir que o campo de velocidades seja incompressível, ou seja, que a divergência do campo seja zero. Isso é importante para simular fluidos realistas, onde a massa é conservada. Este método pode ser implementado resolvendo a equação de Poisson para a pressão e, em seguida, ajustando o campo de velocidades com base no gradiente da pressão.
+
+O procedimento \texttt{project} pode ser implementado da seguinte maneira:
+\begin{lstlisting}[language=C]
+void project(int N, float *u, float *v, float *p, float *div) {
+  int i, j, k;
+  float h = 1.0f / N;
+  for (i = 1; i <= N; i++) {
+    for (j = 1; j <= N; j++) {
+      div[IX(i,j)] = -0.5f*h*(u[IX(i+1,j)]
+      - u[IX(i-1,j)] + v[IX(i,j+1)] - v[IX(i,j-1)]);
+      p[IX(i,j)] = 0;
+    }
+  }
+  set_boundary(N, 0, div); set_boundary(N, 0, p);
+
+  for (k = 0; k < 20; k++) {
+    for (i = 1; i <= N; i++) {
+      for (j = 1; j <= N; j++) {
+        p[IX(i,j)] = (div[IX(i,j)] + p[IX(i-1,j)]
+        + p[IX(i+1,j)] + p[IX(i,j-1)] + p[IX(i,j+1)]) / 4;
+      }
+    }
+    set_boundary(N, 0, p);
+  }
+
+  for (i = 1; i <= N; i++) {
+    for (j = 1; j <= N; j++) {
+      u[IX(i,j)] -= 0.5f*(p[IX(i+1,j)] - p[IX(i-1,j)])/h;
+      v[IX(i,j)] -= 0.5f*(p[IX(i,j+1)] - p[IX(i,j-1)])/h;
+    }
+  }
+  set_boundary(N, 1, u); set_boundary(N, 2, v);
+}
+\end{lstlisting}
+
+\subsection{Conclusão da modelagem de forma}
+Podemos concluir essa seção com esse código maravilhoso que junta tudo:
+
+\begin{lstlisting}[language=C]
+void simulate(int N, float *u, float *v, float *u0, float *v0,
+float *dens, float *dens0, float diff, float visc, float dt) {
+  get_inputs(N, u0, v0, dens0);
+  vel_step(N, u, v, u0, v0, visc, dt);
+  dens_step(N, dens, dens0, u, v, diff, dt);
+  draw_dens(N, dens);
+}
+\end{lstlisting}
+
+a rotina \texttt{draw\_dens} será abordada na seção de shading.
+
 \subsection{Shading}
+\label{sec:shading}
+
+Volumes são tradicionalmente renderizados usando técnicas de ray marching, onde um raio é lançado através do volume e amostras são coletadas ao longo do caminho do raio. Essas amostras são então usadas para calcular a cor e a opacidade do pixel correspondente na imagem final. A equação de rendering para volumes pode ser expressa como:
+$$
+C = \int_{t_{near}}^{t_{far}} T(t) \sigma(t) L(t) dt
+$$
+onde $C$ é a cor final do pixel, $T(t)$ é a transmissão ao longo do caminho do raio, $\sigma(t)$ é a densidade de absorção no ponto $t$, e $L(t)$ é a luz incidente no ponto $t$. A transmissão $T(t)$ é dada por:
+$$
+T(t) = e^{-\int_{t_{near}}^{t} \sigma(s) ds}
+$$
+
+Existem diversas técnicas para otimizar o ray marching, como o uso de grids adaptativos, onde a resolução do grid é maior em áreas de interesse e menor em áreas menos importantes. Outra técnica é o uso de pré-computação de iluminação, onde a iluminação é calculada previamente e armazenada em uma textura 3D, que pode ser rapidamente acessada durante o ray marching. Além disso, técnicas de denoising podem ser aplicadas para reduzir o ruído nas imagens renderizadas, especialmente em simulações de volumes complexos como fumaça e fogo, no entanto, não serão abordadas aqui.
+
+\subsubsection{Interação da luz com volumes}
+
+A luz pode ser absorvida, emitida ou espalhada ao interagir com os volumes gerados até aqui, sendo cada um dos fenômenos descritos por uma equação específica:
+
 \begin{itemize}
-  \item Ray Marching
-  \item Light Scattering 
-  \item SDF
+  \item Absorção: A luz é absorvida pelo meio, reduzindo sua intensidade. Isso é descrito pela lei de Beer-Lambert:
+  $$
+  I(t) = I_0 e^{-\int_{0}^{t} \sigma_a(s) ds}
+  $$
+  onde $I(t)$ é a intensidade da luz no ponto $t$, $I_0$ é a intensidade inicial, e $\sigma_a(s)$ é o coeficiente de absorção no ponto $s$.
+  
+  \item Emissão: O meio pode emitir luz, contribuindo para a intensidade total. A contribuição da emissão pode ser modelada como:
+  $$
+  L_{emit}(t) = \int_{0}^{t} j(s) e^{-\int_{s}^{t} \sigma_a(u) du} ds
+  $$
+  onde $j(s)$ é a taxa de emissão no ponto $s$.
+  
+  \item Espalhamento: A luz pode ser espalhada em diferentes direções ao interagir com o meio. O espalhamento pode ser descrito pela função de fase $p(\omega', \omega)$, que define a probabilidade de um raio de luz ser espalhado da direção $\omega'$ para a direção $\omega$. A contribuição do espalhamento pode ser modelada como:
+  $$
+  L_{scatter}(t) = \int_{0}^{t} \sigma_s(s) \int_{S^2} p(\omega', \omega) L(s, \omega') d\omega' e^{-\int_{s}^{t} \sigma_a(u) du} ds
+  $$
+  onde $\sigma_s(s)$ é o coeficiente de espalhamento no ponto $s$, e $L(s, \omega')$ é a radiância incidente na direção $\omega'$ no ponto $s$ \cite{Kajiya1984}.
 \end{itemize}
 
+Todas essas técnicas se acumulam na equação de rendering volumétrico expressa no inicio da seção \ref{sec:shading}, que pode ser resolvida numericamente usando métodos como ray marching ou path tracing. A implementação dessas técnicas pode variar dependendo do contexto específico e dos requisitos de desempenho e qualidade visual, mas o objetivo geral é capturar a complexidade da interação da luz com volumes de maneira eficiente e realista.
 
+\subsubsection{Implementação básica de ray marching}
+A implementação básica de ray marching envolve o lançamento de um raio através do volume e a amostragem da densidade e outras propriedades do volume ao longo do caminho do raio. O código a seguir ilustra uma implementação simples de ray marching para volumes:
+
+\begin{lstlisting}[language=C]
+vec4 ray_march(vec3 ray_origin, vec3 ray_direction,
+float t_near, float t_far) {
+  vec4 color = vec4(0.0);
+  float t = t_near;
+  float step_size = 0.1;
+  while (t < t_far) {
+    vec3 sample_position = ray_origin + t * ray_direction;
+    float density = sample_density(sample_position);
+    vec4 sample_color = compute_color(density);
+    color += sample_color * exp(-density * step_size);
+    t += step_size;
+  }
+  return color;
+}
+\end{lstlisting}
+
+Este código define uma função `ray\_march` que toma a origem e a direção do raio, bem como os limites próximo e distante do volume. A função itera ao longo do caminho do raio, amostrando a densidade do volume em cada passo e acumulando a cor resultante, levando em consideração a absorção da luz. A função `sample\_density` é responsável por retornar a densidade do volume em uma posição específica, enquanto a função `compute\_color` calcula a cor com base na densidade amostrada. A variável `step\_size` controla a distância entre as amostras ao longo do raio, e pode ser ajustada para equilibrar a qualidade visual e o desempenho. Note que esta é uma implementação simplificada e pode ser expandida para incluir efeitos adicionais, como emissão e espalhamento, conforme discutido anteriormente \cite{Pharr2016}.

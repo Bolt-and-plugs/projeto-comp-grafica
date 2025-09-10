@@ -4,45 +4,45 @@ The top-level auxiliary file: trabalho.aux
 The style file: plain.bst
 Database file #1: bibliography.bib
 Warning--I didn't find a database entry for "muller2003"
-You've used 14 entries,
+You've used 16 entries,
             2118 wiz_defined-function locations,
-            576 strings with 5653 characters,
-and the built_in function-call counts, 4025 in all, are:
-= -- 363
-> -- 180
+            592 strings with 5959 characters,
+and the built_in function-call counts, 4655 in all, are:
+= -- 422
+> -- 211
 < -- 0
-+ -- 73
-- -- 58
-* -- 252
-:= -- 693
-add.period$ -- 43
-call.type$ -- 14
-change.case$ -- 69
++ -- 85
+- -- 68
+* -- 300
+:= -- 800
+add.period$ -- 49
+call.type$ -- 16
+change.case$ -- 80
 chr.to.int$ -- 0
-cite$ -- 14
-duplicate$ -- 174
-empty$ -- 367
-format.name$ -- 58
-if$ -- 843
+cite$ -- 16
+duplicate$ -- 197
+empty$ -- 418
+format.name$ -- 68
+if$ -- 973
 int.to.chr$ -- 0
-int.to.str$ -- 14
-missing$ -- 14
-newline$ -- 74
-num.names$ -- 28
-pop$ -- 91
+int.to.str$ -- 16
+missing$ -- 17
+newline$ -- 84
+num.names$ -- 32
+pop$ -- 103
 preamble$ -- 1
-purify$ -- 57
+purify$ -- 66
 quote$ -- 0
-skip$ -- 98
+skip$ -- 112
 stack$ -- 0
-substring$ -- 173
-swap$ -- 21
+substring$ -- 210
+swap$ -- 23
 text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 54
+type$ -- 60
 warning$ -- 0
-while$ -- 33
-width$ -- 16
-write$ -- 150
+while$ -- 38
+width$ -- 18
+write$ -- 172
 (There was 1 warning)

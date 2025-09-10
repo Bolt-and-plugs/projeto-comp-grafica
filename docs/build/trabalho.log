@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2026/dev/Arch Linux) (preloaded format=pdflatex 2025.8.24)  10 SEP 2025 14:34
+This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2026/dev/Arch Linux) (preloaded format=pdflatex 2025.8.24)  10 SEP 2025 15:40
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -804,17 +804,17 @@ LaTeX Warning: Citation `muller2003' on page 4 undefined on input line 20.
 ) (./terrenos.tex (./perlin.tex
 
 [4]
-<img/donut.png, id=170, 393.47pt x 289.08pt>
+<img/donut.png, id=195, 393.47pt x 289.08pt>
 File: img/donut.png Graphic file (type png)
 <use img/donut.png>
 Package pdftex.def Info: img/donut.png  used on input line 16.
 (pdftex.def)             Requested size: 182.09486pt x 133.7812pt.
-<img/donut2.png, id=171, 381.425pt x 273.02pt>
+<img/donut2.png, id=196, 381.425pt x 273.02pt>
 File: img/donut2.png Graphic file (type png)
 <use img/donut2.png>
 Package pdftex.def Info: img/donut2.png  used on input line 25.
 (pdftex.def)             Requested size: 182.09486pt x 130.33989pt.
-<img/donut3.png, id=172, 383.4325pt x 273.02pt>
+<img/donut3.png, id=197, 383.4325pt x 273.02pt>
 File: img/donut3.png Graphic file (type png)
 <use img/donut3.png>
 Package pdftex.def Info: img/donut3.png  used on input line 32.
@@ -822,7 +822,7 @@ Package pdftex.def Info: img/donut3.png  used on input line 32.
 
 
 [5 <./img/donut.png (PNG copy)> <./img/donut2.png (PNG copy)>]
-<img/donut4.png, id=180, 396.48125pt x 299.1175pt>
+<img/donut4.png, id=205, 396.48125pt x 299.1175pt>
 File: img/donut4.png Graphic file (type png)
 <use img/donut4.png>
 Package pdftex.def Info: img/donut4.png  used on input line 47.
@@ -833,7 +833,7 @@ File: t1pcr.fd 2001/06/04 font definitions for T1/pcr.
 )
 
 [6 <./img/donut3.png (PNG copy)> <./img/donut4.png (PNG copy)>]
-<img/marble.png, id=189, 707.64375pt x 803.0pt>
+<img/marble.png, id=214, 707.64375pt x 803.0pt>
 File: img/marble.png Graphic file (type png)
 <use img/marble.png>
 Package pdftex.def Info: img/marble.png  used on input line 88.
@@ -847,15 +847,16 @@ File: lstlang1.sty 2024/09/23 1.10c listings language file
 ) (/usr/share/texmf-dist/tex/latex/listings/lstmisc.sty
 File: lstmisc.sty 2024/09/23 1.10c (Carsten Heinz)
 )
-Overfull \hbox (214.3627pt too wide) in paragraph at lines 32--33
-[][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][] 
- []
 
-) (./justificativa.tex) (./objetivos.tex) (./metodologia.tex) (./resultados.tex) (./conclusao.tex) (build/trabalho.bbl
+[9]
 
-[9])
+[10]
 
-[10] (build/trabalho.aux)
+[11]) (./justificativa.tex) (./objetivos.tex) (./metodologia.tex) (./resultados.tex) (./conclusao.tex) (build/trabalho.bbl
+
+[12])
+
+[13] (build/trabalho.aux)
  ***********
 LaTeX2e <2024-11-01> patch level 2
 L3 programming layer <2025-01-18>
@@ -865,21 +866,21 @@ L3 programming layer <2025-01-18>
 LaTeX Warning: There were undefined references.
 
 Package rerunfilecheck Info: File `trabalho.out' has not changed.
-(rerunfilecheck)             Checksum: 1313ED4E455BBE189CFE5C96131AFCAE;2723.
+(rerunfilecheck)             Checksum: 237105ECB9469C3C29187FC98C5C43DE;3779.
  ) 
 Here is how much of TeX's memory you used:
- 28498 strings out of 475171
- 523359 string characters out of 5767095
- 1195156 words of memory out of 5000000
- 50916 multiletter control sequences out of 15000+600000
+ 28661 strings out of 475171
+ 525442 string characters out of 5767095
+ 1236463 words of memory out of 5000000
+ 51002 multiletter control sequences out of 15000+600000
  589409 words of font info for 77 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
  84i,6n,93p,1016b,1142s stack positions out of 10000i,1000n,20000p,200000b,200000s
-</usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi12.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr/share/texmf-dist/fonts/type1/urw/courier/ucrr8a.pfb></usr/share/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/share/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on build/trabalho.pdf (11 pages, 2393588 bytes).
+</usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cmextra/cmex8.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi12.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi6.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr6.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr/share/texmf-dist/fonts/type1/urw/courier/ucrr8a.pfb></usr/share/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/share/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
+Output written on build/trabalho.pdf (14 pages, 2436355 bytes).
 PDF statistics:
- 288 PDF objects out of 1000 (max. 8388607)
- 243 compressed objects within 3 object streams
- 66 named destinations out of 1000 (max. 500000)
- 182 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 429 PDF objects out of 1000 (max. 8388607)
+ 374 compressed objects within 4 object streams
+ 143 named destinations out of 1000 (max. 500000)
+ 222 words of extra memory for PDF output out of 10000 (max. 10000000)
 

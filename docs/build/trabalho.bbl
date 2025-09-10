@@ -35,6 +35,11 @@ Nick Foster and Dimitris Metaxas.
 \newblock Realistic animation of liquids.
 \newblock {\em Graphical Models and Image Processing}, 58(5):471--483, 1996.
 
+\bibitem{Kajiya1984}
+James~T. Kajiya and Brian~P Von~Herzen.
+\newblock Ray tracing volume densities.
+\newblock {\em SIGGRAPH Comput. Graph.}, 18(3):165–174, January 1984.
+
 \bibitem{muller2002}
 Matthias Müller, Julie Dorsey, Leonard McMillan, Robert Jagnow, and Barbara Cutler.
 \newblock Stable real-time deformations.
@@ -44,6 +49,11 @@ Matthias Müller, Julie Dorsey, Leonard McMillan, Robert Jagnow, and Barbara Cut
 Ken Perlin.
 \newblock An image synthesizer.
 \newblock {\em ACM SIGGRAPH Computer Graphics}, 19(3):287--296, 1985.
+
+\bibitem{Pharr2016}
+Matt Pharr, Wenzel Jakob, and Greg Humphreys.
+\newblock {\em Physically Based Rendering: From Theory to Implementation}.
+\newblock Morgan Kaufmann, 3rd edition, 2016.
 
 \bibitem{reeves1983}
 William~T. Reeves.
