@@ -53,33 +53,33 @@ Como estes cálculos e tecnicas são aplicados em nível de pixel, a frequència
 
 Exemplo de cálculo com a frequência inversa, aplicando transformações em todos os octetos:
 
-\begin{verbatim}
+\begin{lstlisting}[language=Python, caption={Pseudocódigo da função turbulence()}]
 f=l
 while (f < pixel_freq):
   normal + = Dnoise(f * point)
   f*=2 
-\end{verbatim}
+\end{lstlisting}
 
 O autor descreve uma técnica para simular a aparência de mármore usando a função Noise(). O método parte do princípio de que a aparência do mármore resulta de camadas heterogêneas que foram deformadas por forças turbulentas antes de se solidificarem. A abordagem é, portanto, uma combinação de uma estrutura regular e simples (as camadas) com uma complexa estrutura estocástica (o ruído da turbulência). A base do modelo são as camadas, representadas por uma simples onda senoidal, sin(x). O autor usa a coordenada point[1] como o input para essa função, e o valor resultante é então mapeado para cores através de uma função auxiliar marble\_color(). Para adicionar o realismo das forças turbulentas, o autor introduz uma função turbulence(). Esta função é usada para perturbar a coordenada de entrada x antes que ela seja passada para a onda senoidal. O pseudocódigo que combina esses elementos é o seguinte:
 
 % code
-\begin{verbatim}
-function marble(point)
+\begin{lstlisting}[language=Python, caption={Pseudocódigo da função turbulence()}]
+def marble(point):
   x = point[1] + turbulence(point)
   return marble\_color(sin(x))
-\end{verbatim}
+\end{lstlisting}
 
 A função turbulence() é, por sua vez, uma soma de ruído em diferentes escalas, um processo que cria um padrão auto-semelhante ou 1/f. O algoritmo para a turbulence() é detalhado como:
 
-\begin{verbatim}
-function turbulence(p)
+\begin{lstlisting}[language=Python, caption={Pseudocódigo da função turbulence()}]
+def turbulence(p):
   t = 0
   scale = 1
   while (scale > pixelsize)
     t += abs(Noise(p / scale) * scale)
     scale *= 2
   return t
-\end{verbatim}
+\end{lstlisting}
 
 Este procedimento garante que a quantidade de ruído adicionada em cada escala seja proporcional ao seu tamanho, resultando na impressão visual de movimento browniano. Além disso, o uso da função abs() em cada iteração assegura que o gradiente da textura tenha limites descontínuos em todas as escalas, o que é interpretado visualmente como fluxo turbulento
 

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2026/dev/Arch Linux) (preloaded format=pdflatex 2025.8.24)  10 SEP 2025 15:40
+This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2026/dev/Arch Linux) (preloaded format=pdflatex 2025.8.24)  10 SEP 2025 16:25
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -795,57 +795,62 @@ l.69 \newpage
 LaTeX Font Info:    Trying to load font information for TS1+ptm on input line 18.
  (/usr/share/texmf-dist/tex/latex/psnfss/ts1ptm.fd
 File: ts1ptm.fd 2001/06/04 font definitions for TS1/ptm.
-)) (./fluidos.tex
-
-[3]
-
-LaTeX Warning: Citation `muller2003' on page 4 undefined on input line 20.
-
-) (./terrenos.tex (./perlin.tex
-
-[4]
-<img/donut.png, id=195, 393.47pt x 289.08pt>
+)) (./terrenos.tex (./perlin.tex
+<img/donut.png, id=147, 393.47pt x 289.08pt>
 File: img/donut.png Graphic file (type png)
 <use img/donut.png>
 Package pdftex.def Info: img/donut.png  used on input line 16.
 (pdftex.def)             Requested size: 182.09486pt x 133.7812pt.
-<img/donut2.png, id=196, 381.425pt x 273.02pt>
+
+
+[3]
+<img/donut2.png, id=164, 381.425pt x 273.02pt>
 File: img/donut2.png Graphic file (type png)
 <use img/donut2.png>
 Package pdftex.def Info: img/donut2.png  used on input line 25.
 (pdftex.def)             Requested size: 182.09486pt x 130.33989pt.
-<img/donut3.png, id=197, 383.4325pt x 273.02pt>
+<img/donut3.png, id=165, 383.4325pt x 273.02pt>
 File: img/donut3.png Graphic file (type png)
 <use img/donut3.png>
 Package pdftex.def Info: img/donut3.png  used on input line 32.
 (pdftex.def)             Requested size: 182.09486pt x 129.66084pt.
-
-
-[5 <./img/donut.png (PNG copy)> <./img/donut2.png (PNG copy)>]
-<img/donut4.png, id=205, 396.48125pt x 299.1175pt>
+<img/donut4.png, id=166, 396.48125pt x 299.1175pt>
 File: img/donut4.png Graphic file (type png)
 <use img/donut4.png>
 Package pdftex.def Info: img/donut4.png  used on input line 47.
 (pdftex.def)             Requested size: 182.09486pt x 137.3812pt.
-LaTeX Font Info:    Trying to load font information for T1+pcr on input line 56.
- (/usr/share/texmf-dist/tex/latex/psnfss/t1pcr.fd
-File: t1pcr.fd 2001/06/04 font definitions for T1/pcr.
-)
 
-[6 <./img/donut3.png (PNG copy)> <./img/donut4.png (PNG copy)>]
-<img/marble.png, id=214, 707.64375pt x 803.0pt>
+
+[4 <./img/donut.png (PNG copy)> <./img/donut2.png (PNG copy)> <./img/donut3.png (PNG copy)>] (/usr/share/texmf-dist/tex/latex/listings/lstlang1.sty
+File: lstlang1.sty 2024/09/23 1.10c listings language file
+)
+Package hyperref Info: bookmark level for unknown lstlisting defaults to 0 on input line 56.
+
+
+[5 <./img/donut4.png (PNG copy)>]
+<img/marble.png, id=195, 707.64375pt x 803.0pt>
 File: img/marble.png Graphic file (type png)
 <use img/marble.png>
 Package pdftex.def Info: img/marble.png  used on input line 88.
 (pdftex.def)             Requested size: 182.09486pt x 206.63084pt.
+)) (./fluidos.tex
+
+[6 <./img/marble.png (PNG copy)>]
+
+LaTeX Warning: Citation `muller2003' on page 7 undefined on input line 20.
 
 
-[7 <./img/marble.png (PNG copy)>])) (./volumes.tex
+
+[7]) (./volumes.tex
 
 [8] (/usr/share/texmf-dist/tex/latex/listings/lstlang1.sty
 File: lstlang1.sty 2024/09/23 1.10c listings language file
 ) (/usr/share/texmf-dist/tex/latex/listings/lstmisc.sty
 File: lstmisc.sty 2024/09/23 1.10c (Carsten Heinz)
+)
+LaTeX Font Info:    Trying to load font information for T1+pcr on input line 58.
+ (/usr/share/texmf-dist/tex/latex/psnfss/t1pcr.fd
+File: t1pcr.fd 2001/06/04 font definitions for T1/pcr.
 )
 
 [9]
@@ -866,21 +871,21 @@ L3 programming layer <2025-01-18>
 LaTeX Warning: There were undefined references.
 
 Package rerunfilecheck Info: File `trabalho.out' has not changed.
-(rerunfilecheck)             Checksum: 237105ECB9469C3C29187FC98C5C43DE;3779.
+(rerunfilecheck)             Checksum: 1B0C09014CEAE49A98E0978F7A9C5DBC;3779.
  ) 
 Here is how much of TeX's memory you used:
- 28661 strings out of 475171
- 525442 string characters out of 5767095
- 1236463 words of memory out of 5000000
- 51002 multiletter control sequences out of 15000+600000
+ 28805 strings out of 475171
+ 527075 string characters out of 5767095
+ 1237782 words of memory out of 5000000
+ 51127 multiletter control sequences out of 15000+600000
  589409 words of font info for 77 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
- 84i,6n,93p,1016b,1142s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 84i,6n,93p,1016b,2004s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cmextra/cmex8.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi12.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi6.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr6.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr/share/texmf-dist/fonts/type1/urw/courier/ucrr8a.pfb></usr/share/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/share/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on build/trabalho.pdf (14 pages, 2436355 bytes).
+Output written on build/trabalho.pdf (14 pages, 2433103 bytes).
 PDF statistics:
- 429 PDF objects out of 1000 (max. 8388607)
- 374 compressed objects within 4 object streams
- 143 named destinations out of 1000 (max. 500000)
+ 450 PDF objects out of 1000 (max. 8388607)
+ 395 compressed objects within 4 object streams
+ 160 named destinations out of 1000 (max. 500000)
  222 words of extra memory for PDF output out of 10000 (max. 10000000)
 

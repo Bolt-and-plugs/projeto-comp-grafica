@@ -1,13 +1,13 @@
 # Fdb version 4
-["bibtex build/trabalho"] 1757529645.95688 "build/trabalho.aux" "build/trabalho.bbl" "build/trabalho" 1757529646.86462 0
+["bibtex build/trabalho"] 1757532316.73574 "build/trabalho.aux" "build/trabalho.bbl" "build/trabalho" 1757532328.54346 0
   "./bibliography.bib" 1757529619.78924 4425 bf18a9dcb26a271f7270be45de74806b ""
   "/usr/share/texmf-dist/bibtex/bst/base/plain.bst" 1755987285 20613 bd3fbfa9f64872b81ac57a0dd2ed855f ""
-  "build/trabalho.aux" 1757529646.68151 5833 de3ce9583887d5e92e23ab35d19916c6 "pdflatex"
+  "build/trabalho.aux" 1757532328.3663 6304 a6380afd72b1b421d560420acdff1349 "pdflatex"
   (generated)
   "build/trabalho.bbl"
   "build/trabalho.blg"
   (rewritten before read)
-["pdflatex"] 1757529646.01437 "trabalho.tex" "build/trabalho.pdf" "trabalho" 1757529646.86479 0
+["pdflatex"] 1757532327.69376 "trabalho.tex" "build/trabalho.pdf" "trabalho" 1757532328.54362 0
   "/usr/share/texmf-dist/fonts/enc/dvips/base/8r.enc" 1755987285 4850 80dc9bab7f31fb78a000ccfed0e27cab ""
   "/usr/share/texmf-dist/fonts/map/fontname/texfonts.map" 1755987285 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/share/texmf-dist/fonts/tfm/adobe/courier/pcrr8r.tfm" 1755987285 1292 bd42be2f344128bff6d35d98474adfe3 ""
@@ -220,10 +220,10 @@
   "/usr/share/texmf-dist/web2c/texmf.cnf" 1755987285 42087 b0f9697c952c8f5a8eede4134282cb0d ""
   "/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map" 1756037807 5311557 9da84c45f5b388655502706482323571 ""
   "/var/lib/texmf/web2c/pdftex/pdflatex.fmt" 1756037789 2008246 8442084c5eaa1f7daa8ee6c7f463d0c7 ""
-  "build/trabalho.aux" 1757529646.68151 5833 de3ce9583887d5e92e23ab35d19916c6 "pdflatex"
-  "build/trabalho.bbl" 1757529646.0065 2841 a9a0db0c09417d1ab8bb9675ffc0118b "bibtex build/trabalho"
-  "build/trabalho.out" 1757529646.68251 3779 237105ecb9469c3c29187fc98c5c43de "pdflatex"
-  "build/trabalho.toc" 1757529646.68251 2009 bb22c73aae3e7d5d271d084446753307 "pdflatex"
+  "build/trabalho.aux" 1757532328.3663 6304 a6380afd72b1b421d560420acdff1349 "pdflatex"
+  "build/trabalho.bbl" 1757532316.78523 2841 a9a0db0c09417d1ab8bb9675ffc0118b "bibtex build/trabalho"
+  "build/trabalho.out" 1757532328.36851 3779 1b0c09014ceae49a98e0978f7a9c5dbc "pdflatex"
+  "build/trabalho.toc" 1757532328.36851 2009 98f133ef091edb7a59878161e9aa0e94 "pdflatex"
   "conclusao.tex" 1757438705.00534 31 a1929ce7af1882f024ebaef3890c3134 ""
   "fluidos.tex" 1757523553.21978 4243 e358e3cebcbf0cf541ed2dd0c6d79e97 ""
   "img/donut.png" 1757436266.13976 279840 5ed27d02ddbf8457f384f8c2ea671096 ""
@@ -235,12 +235,12 @@
   "justificativa.tex" 1757438944.90471 64 13857b27166d464b243f5ef184303e5f ""
   "metodologia.tex" 1757439300.69907 58 e9ebf9ff355b58a64c2bcd43a15353d6 ""
   "objetivos.tex" 1757438732.75839 24 454d1a3ec0980ff839ac6b7c9794df5e ""
-  "perlin.tex" 1757438630.1002 6174 5c81c65416673c06a38ef65623b71642 ""
+  "perlin.tex" 1757532326.12128 6379 31d7d2e4f904ddc9f9deb05ae0d2c965 ""
   "resultados.tex" 1757438968.63974 55 e077447f6719863e0ec84669795eac96 ""
   "sistema-de-particulas.tex" 1757446486.80619 3171 1cd32788c6fd626e879a160ef6e13962 ""
   "terrenos.tex" 1757438642.11122 554 e53c4526e0a1f706d0ae617ead960eda ""
-  "trabalho.tex" 1757525523.61209 1862 e748c5e66ba92fe01ecb9d2985841068 ""
-  "volumes.tex" 1757529645.5645 11832 4eb3555d0cab85d458edd8ad2e2ad1c2 ""
+  "trabalho.tex" 1757532156.62227 1862 b8586c8291fcc58a9d6d2af533468ced ""
+  "volumes.tex" 1757529668.20214 11832 4eb3555d0cab85d458edd8ad2e2ad1c2 ""
   (generated)
   "build/trabalho.aux"
   "build/trabalho.log"
