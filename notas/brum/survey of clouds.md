@@ -1,1 +1,0 @@
-vou começar amanha! tmj 😘
