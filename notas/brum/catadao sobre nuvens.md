@@ -9,7 +9,7 @@ em filmes, o tempo gasto computacionalmente não é relavante, diferente de em j
 existe o balanço entre qualidade e eficiência, que é definido pelo contexto da aplicação
 
 existem 10 tipos de nuvens:
-![[Pasted image 20250916160920.png]]
+![[fig1 - catadao.png]]
 
 podem também ser classificadas com base em:
 - elevação (baixo, médio ou alto)
@@ -82,7 +82,7 @@ reconhecimento de padrões e classificação
 
 reconstrução a partir de imagem única
 - Yuan et al
-![[Pasted image 20250918165834.png]]
+![[fig 3 - catadao.png]]
 
 **imagens de satélite**
 
