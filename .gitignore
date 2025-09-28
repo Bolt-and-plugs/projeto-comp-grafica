@@ -1,3 +1,6 @@
 target/
 compile_commands*.json
 .cache/
+.idea/
+build/
+docs/build

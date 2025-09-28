@@ -1,0 +1,20 @@
+#pragma kernel CSMain
+
+struct Particle
+{
+    float3 position;
+};
+
+RWStructuredBuffer<Particle> particles;
+float deltaTime;
+
+[numthreads(8,8,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    uint index = id.x;
+
+    // Get the particle we are supposed to process from the buffer.
+    Particle p = particles[index];
+    p.position.y += 1.0 * deltaTime;
+    particles[index] = p;
+}
