@@ -1,0 +1,79 @@
+#pragma kernel AdvectKernel
+#pragma kernel DiffuseKernel
+
+// --- Global Variables ---
+// These are set by the C# script
+
+// A sampler for smooth interpolation between grid cells
+SamplerState sampler_linear_clamp;
+
+// Grid dimensions and time step
+float3 gridSize;
+float deltaTime;
+
+// --- Advection Kernel Variables ---
+Texture3D<float4> velocityRead; // 3D Vector field for velocity
+Texture3D<float> densityRead;   // Scalar field for density
+RWTexture3D<float> densityWrite; // Output texture
+
+// --- Diffusion Kernel Variables ---
+// Note: These can reuse the densityRead/Write textures from C#,
+// but are named generically here for clarity.
+Texture3D<float> bufferRead;
+Texture3D<float> initialBuffer;
+RWTexture3D<float> bufferWrite;
+float alpha;
+float rBeta;
+
+
+// --- Kernels ---
+
+// AdvectKernel: Moves density along the velocity field
+[numthreads(8, 8, 8)]
+void AdvectKernel(uint3 id : SV_DispatchThreadID)
+{
+    // 1. Get the velocity at the current grid cell's center
+    // We normalize the coordinates to the 0-1 range for sampling
+    float3 pos = (id + 0.5f) / gridSize;
+    float3 vel = velocityRead.SampleLevel(sampler_linear_clamp, pos, 0).xyz;
+
+    // 2. Calculate the previous position by tracing backwards in time
+    float3 previousPos = float3(id.x, id.y, id.z) - vel * deltaTime;
+
+    // 3. Sample the density from that previous position (interpolated)
+    float3 previousPosNormalized = (previousPos + 0.5f) / gridSize;
+    float advectedDensity = densityRead.SampleLevel(sampler_linear_clamp, previousPosNormalized, 0);
+
+    // 4. Write the result to the output grid
+    densityWrite[id] = advectedDensity;
+}
+
+
+// DiffuseKernel: Spreads the density out over time
+[numthreads(8, 8, 8)]
+void DiffuseKernel(uint3 id : SV_DispatchThreadID)
+{
+    // Prevent reading out of bounds (simple clamp)
+    if (id.x >= gridSize.x - 1 || id.y >= gridSize.y - 1 || id.z >= gridSize.z - 1 ||
+        id.x < 1 || id.y < 1 || id.z < 1) {
+        return;
+    }
+
+    // 1. Sample the six direct neighbors from the previous iteration's buffer
+    float neighborSum =
+        bufferRead[id + uint3(-1, 0, 0)] +
+        bufferRead[id + uint3(1, 0, 0)] +
+        bufferRead[id + uint3(0, -1, 0)] +
+        bufferRead[id + uint3(0, 1, 0)] +
+        bufferRead[id + uint3(0, 0, -1)] +
+        bufferRead[id + uint3(0, 0, 1)];
+
+    // 2. Get the value from the initial state of the buffer (before this solve started)
+    float initialValue = initialBuffer[id];
+
+    // 3. Apply the Jacobi iteration formula to solve for the new value
+    float diffusedValue = (neighborSum + alpha * initialValue) * rBeta;
+
+    // 4. Write the result for this single iteration
+    bufferWrite[id] = diffusedValue;
+}

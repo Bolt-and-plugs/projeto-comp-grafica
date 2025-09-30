@@ -1,0 +1,32 @@
+#pragma kernel AdvectKernel
+
+// Grids for reading velocity and the quantity to advect (e.g., density)
+Texture3D<float4> velocityRead;
+Texture3D<float> densityRead;
+
+// Grid for writing the new, advected density
+RWTexture3D<float> densityWrite;
+
+// Sampler for smooth interpolation
+SamplerState sampler_linear_clamp;
+
+float3 gridSize;
+float deltaTime;
+
+[numthreads(8,8,8)]
+void AdvectKernel(uint3 id : SV_DispatchThreadID)
+{
+    // 1. Get the current velocity at this grid cell
+    float3 vel = velocityRead.SampleLevel(sampler_linear_clamp, (id + 0.5f) / gridSize, 0).xyz;
+
+    // 2. Calculate the previous position by tracing backwards in time
+    float3 previousPos = float3(id.x, id.y, id.z) - vel * deltaTime;
+
+    // 3. Sample the density from the previous position
+    // We use linear interpolation (thanks to the sampler) to get a smooth value
+    // from between grid cells.
+    float advectedDensity = densityRead.SampleLevel(sampler_linear_clamp, (previousPos + 0.5f) / gridSize, 0);
+
+    // 4. Write the result to the new density grid
+    densityWrite[id] = advectedDensity;
+}

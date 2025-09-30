@@ -1,3 +1,7 @@
+# CloudURP
+- [ ] start density and velocity vectors with some data 
+- [ ] make sure ray marching is working
+
 # sessoes 
 
 Trabalho de computação gráfica focado em físicas e simulações.

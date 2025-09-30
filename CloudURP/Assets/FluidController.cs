@@ -1,70 +1,125 @@
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public class FluidController : MonoBehaviour
 {
+    [Header("Simulation Settings")]
     public ComputeShader computeShader;
-    // 1. Assign this in the Inspector by creating a new Material
-    //    and assigning the ParticleRenderer shader to it.
-    public Material particleMaterial;
-    public int num_particles = 1000;
+    public Vector3Int gridSize = new Vector3Int(128, 128, 128);
 
-    private ComputeBuffer _particleBuffer;
-    private int _kernelIndex;
+    [Header("Rendering")]
+    public Material rayMarchMaterial;
 
-    struct Particle
-    {
-        public Vector3 position;
-    }
+    // Simulation data is stored in 3D Render Textures
+    private RenderTexture densityRead, densityWrite;
+    private RenderTexture velocityRead, velocityWrite;
+
+    // Kernel indices for the compute shader
+    private int advectKernel;
+    private int diffuseKernel;
 
     void Start()
     {
-        _particleBuffer = new ComputeBuffer(num_particles, sizeof(float) * 3);
-
-        Particle[] particles = new Particle[num_particles];
-        for (int i = 0; i < num_particles; i++)
+        RenderTextureDescriptor desc = new RenderTextureDescriptor
         {
-            // Start particles inside a cube shape around the GameObject's position
-            Vector3 randomPos = new Vector3(
-                Random.Range(-1f, 1f),
-                Random.Range(-1f, 1f),
-                Random.Range(-1f, 1f)
-            );
-            particles[i] = new Particle
-            {
-                position = transform.position + randomPos
-            };
-        }
-        _particleBuffer.SetData(particles);
+            dimension = TextureDimension.Tex3D,
+            width = gridSize.x,
+            height = gridSize.y,
+            volumeDepth = gridSize.z,
+            enableRandomWrite = true,
+            msaaSamples = 1
+        };
 
-        _kernelIndex = computeShader.FindKernel("CSMain");
-        computeShader.SetBuffer(_kernelIndex, "particles", _particleBuffer);
+        // Create the density buffers (single float channel is enough)
+        desc.colorFormat = RenderTextureFormat.RFloat;
+        densityRead = new RenderTexture(desc);
+        densityWrite = new RenderTexture(desc);
+        densityRead.Create();
+        densityWrite.Create();
+
+        // Create the velocity buffers
+        desc.colorFormat = RenderTextureFormat.ARGBFloat; // R, G, B for X, Y, Z velocity
+        velocityRead = new RenderTexture(desc);
+        velocityWrite = new RenderTexture(desc);
+        velocityRead.Create();
+        velocityWrite.Create();
+
+        // 2. Find and store the kernel indices
+        advectKernel = computeShader.FindKernel("AdvectKernel");
+        diffuseKernel = computeShader.FindKernel("DiffuseKernel");
+
+        // dispatch some random intialization for testing (with no extra kernel)
+
+
     }
 
     void Update()
     {
+      if (Input.GetKey(KeyCode.Space)) // Hold Space to add density
+      {
+        computeShader.SetVector("injectPos", new Vector3(gridSize.x / 2f, gridSize.y / 2f, gridSize.z / 2f));
+        computeShader.SetFloat("injectRadius", 32f);
+        computeShader.SetFloat("injectValue", 1.0f);
+        computeShader.SetTexture(injectKernel, "densityWrite", densityRead);
+        computeShader.Dispatch(injectKernel, gridSize.x / 8, gridSize.y / 8, gridSize.z / 8);
+    }
+        // --- SIMULATION PASSES ---
+        // You will expand this section with more passes for a full fluid simulation
+
+        // Pass global variables to the compute shader
         computeShader.SetFloat("deltaTime", Time.deltaTime);
+        computeShader.SetInts("gridSize", new int[] { gridSize.x, gridSize.y, gridSize.z });
+        
+        // --- Advection Pass ---
+        computeShader.SetTexture(advectKernel, "velocityRead", velocityRead);
+        computeShader.SetTexture(advectKernel, "densityRead", densityRead);
+        computeShader.SetTexture(advectKernel, "densityWrite", densityWrite);
+        computeShader.Dispatch(advectKernel, gridSize.x / 8, gridSize.y / 8, gridSize.z / 8);
+        Swap(ref densityRead, ref densityWrite);
 
-        int threadGroups = Mathf.CeilToInt(num_particles / 64f);
-        computeShader.Dispatch(_kernelIndex, threadGroups, 1, 1);
+        // --- Diffusion Pass ---
+        float diffusionRate = 0.1f; // Adjust this value to control diffusion speed
+        if (diffusionRate > 0 && Time.deltaTime > 0)
+        {
+            float alpha = (gridSize.x * gridSize.x) / (diffusionRate * Time.deltaTime);
+            float rBeta = 1.0f / (6.0f + alpha);
+            computeShader.SetFloat("alpha", alpha);
+            computeShader.SetFloat("rBeta", rBeta);
+
+            computeShader.SetTexture(diffuseKernel, "initialBuffer", densityRead);
+
+            for (int i = 0; i < 20; i++) // More iterations = more accurate diffusion
+            {
+                computeShader.SetTexture(diffuseKernel, "bufferRead", densityRead);
+                computeShader.SetTexture(diffuseKernel, "bufferWrite", densityWrite);
+                computeShader.Dispatch(diffuseKernel, gridSize.x / 8, gridSize.y / 8, gridSize.z / 8);
+                Swap(ref densityRead, ref densityWrite);
+            }
+        }
+
+        // --- RENDER ---
+        // 3. Pass the final simulation data to the ray marching material
+        if (rayMarchMaterial != null)
+        {
+            rayMarchMaterial.SetTexture("_DensityTex", densityRead);
+            rayMarchMaterial.SetVector("_GridSize", (Vector3)gridSize);
+        }
     }
 
-    // 2. This function is called by Unity after a camera finishes rendering
-    void OnRenderObject() {
-        // 3. Set the particle buffer on the rendering material
-        particleMaterial.SetBuffer("particles", _particleBuffer);
-
-        // 4. Tell the material to draw itself
-        particleMaterial.SetPass(0);
-
-        // 5. Issue the magical draw command!
-        // This tells the GPU: "Draw me 'num_particles' points using the currently active shader."
-        Graphics.DrawProceduralNow(MeshTopology.Points, 1, num_particles);
+    // Helper function to swap RenderTextures for ping-ponging
+    void Swap(ref RenderTexture a, ref RenderTexture b)
+    {
+        RenderTexture temp = a;
+        a = b;
+        b = temp;
     }
 
+    // 4. Proper cleanup of GPU resources
     void OnDestroy()
     {
-        if (_particleBuffer != null) {
-            _particleBuffer.Release();
-        }
+        if (densityRead != null) densityRead.Release();
+        if (densityWrite != null) densityWrite.Release();
+        if (velocityRead != null) velocityRead.Release();
+        if (velocityWrite != null) velocityWrite.Release();
     }
 }
