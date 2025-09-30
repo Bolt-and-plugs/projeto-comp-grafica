@@ -1,4 +1,4 @@
-### introdução
+### 1. introdução
 
 é aplicado tanto de maneira estática quanto dinâmica
 - cenas estáticas -> foca em fotorealismo
@@ -16,7 +16,7 @@ podem também ser classificadas com base em:
 - conteúdo (água ou gelo)
 - estrutura (em camadas ou dispersa)
 
-### modelamento
+### 2. modelamento
 
 existem várias técnicas para criara formas semelhantes à nuvens reais, entre elas temos as *mesh-based* e métodos volumétricos, gernado formas a partir de texturas ou ruído (até mesmo a partir de imagens)
 
@@ -89,8 +89,16 @@ reconstrução a partir de imagem única
 não é muito necessário se prolongar nesse...
 
 
+### 3. renderização
 
+renderização de nuvens pode ser assumida como dois componentes essenciais
+a iluminação captura a iluminação ou interação das partículas de nuvem com a luz ao seu redor
 
+a técnica de renderização utiliza o lançamento de raios, rasterização ou uma variante para converter o formato existente, configuração de iluminação, etc.., para apresentar a nuvem final na tela
 
+#### 3.1 iluminação
 
+destaca-se o fenômeno de dipersão, o qual pode ser definido como o redirecionamento de luz incidente pela interação com moléculas do meio
+
+o albedo (o tanto de luz q é refletida por um corpo) é próximo de 1, o que implica que tem pouquíssima absorção de luz, isso leva para uma alta re-emissão da luz recebida pelas partículas da nuvem, na direçaõ para frente (*anisotropic scattering*, ref 69 & 81)
 
