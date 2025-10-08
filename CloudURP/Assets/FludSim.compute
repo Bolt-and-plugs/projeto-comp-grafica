@@ -4,7 +4,6 @@
 #pragma kernel AddVelocitySourceKernel
 #pragma kernel AdvectKernel
 #pragma kernel DiffuseKernel
-#pragma kernel DissipateKernel
 #pragma kernel SetBoundaryKernel
 
 // Sampler for filtered sampling of 3D textures
@@ -13,7 +12,6 @@ SamplerState sampler_linear_clamp;
 // Grid dimensions (xyz) and dt
 float4 gridSize;     // xyz used
 float  deltaTime;
-float dissipation; // For density dissipation
 
 // ---------------- Velocity ----------------
 RWTexture3D<float4> velocityWrite;  // For initialization / velocity sources
@@ -144,18 +142,6 @@ void DiffuseKernel(uint3 id : SV_DispatchThreadID)
     float val = (sumN + alpha * initVal) * rBeta;
     bufferWrite[id] = val;
 }
-
-
-[numthreads(8,8,8)]
-void DissipateKernel(uint3 id : SV_DispatchThreadID)
-{
-    float3 size = gridSize.xyz;
-    if (!InBounds(id, size)) return;
-    
-    float current = densityWrite[id];
-    densityWrite[id] = current * dissipation;
-}
-
 
 // Sets density to zero on the boundaries
 [numthreads(8,8,8)]

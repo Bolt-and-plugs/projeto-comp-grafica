@@ -30,21 +30,6 @@ public class FluidController : MonoBehaviour
     [Header("Generic Source (Prebaked)")]
     public bool addConstantSource = true;
     public float sourceScale = 1.0f;
-    [Header("Dissipation")]
-    public float dissipation = 0.985f;
-
-    private int kDissipate = -1;
-
-    // No FindKernels():
-    kDissipate = SafeFind("DissipateKernel");
-
-    // No Update(), após difusão:
-    if (kDissipate >= 0)
-    {
-      computeShader.SetFloat("dissipationRate", dissipationRate);
-      computeShader.SetTexture(kDissipate, "densityWrite", densityA);
-      DispatchFull(kDissipate);
-    }
 
     [Header("Rendering")]
     public Material rayMarchMaterial;
@@ -171,13 +156,6 @@ public class FluidController : MonoBehaviour
                 DispatchFull(kDiffuse);
                 Swap(ref densityA, ref densityB);
             }
-        }
-        // dissipation
-        if (kDissipate >= 0)
-        {
-            computeShader.SetFloat("dissipationRate", dissipation);
-            computeShader.SetTexture(kDissipate, "densityWrite", densityA);
-            DispatchFull(kDissipate);
         }
 
         // 5. Update material
