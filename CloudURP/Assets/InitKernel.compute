@@ -1,0 +1,22 @@
+#pragma kernel InitKernel
+
+RWTexture3D<float> densityWrite;
+float3 sourcePos;
+float sourceRadius;
+
+[numthreads(8, 8, 8)]
+void InitKernel(uint3 id : SV_DispatchThreadID)
+{
+    // Cria uma esfera de densidade no centro
+    float3 pos = float3(id.x, id.y, id.z);
+    float dist = length(pos - sourcePos);
+    
+    if (dist < sourceRadius)
+    {
+        densityWrite[id] = 1.0 - (dist / sourceRadius); // Gradiente suave
+    }
+    else
+    {
+        densityWrite[id] = 0.0;
+    }
+}
