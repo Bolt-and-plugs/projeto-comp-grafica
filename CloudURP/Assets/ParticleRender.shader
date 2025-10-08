@@ -3,125 +3,127 @@ Shader "Custom/RayMarchShader"
     Properties
     {
         _DensityTex ("Density Texture", 3D) = "" {}
-        _Intensity ("Intensity", Range(0, 10)) = 5
-        _StepCount ("Step Count", Range(32, 256)) = 128
+        _CloudColor ("Cloud Color", Color) = (0.85,0.9,1,1)
+        _Extinction ("Extinction", Float) = 1.5
+        _Steps ("Ray March Steps", Int) = 96
+        _DebugBounds ("Debug Bounds", Int) = 0
     }
     SubShader
     {
         Tags { "Queue"="Transparent" "RenderType"="Transparent" }
-        
+        Blend SrcAlpha OneMinusSrcAlpha
+        Cull Off
+        ZWrite Off
+
         Pass
         {
-            Blend SrcAlpha OneMinusSrcAlpha
-            ZWrite Off
-            Cull Front  // Renderiza de trás para frente
-
             CGPROGRAM
             #pragma vertex vert
             #pragma fragment frag
-            #pragma target 3.5
+            #pragma target 4.0
 
             #include "UnityCG.cginc"
 
             sampler3D _DensityTex;
-            float4 _GridSize;
-            float _Intensity;
-            int _StepCount;
+            float3 _GridSize;
+            float3 _BoundsMin;
+            float3 _BoundsSize;
+            float4 _CloudColor;    // rgb used
+            float  _Extinction;
+            int    _Steps;
+            int    _DebugBounds;
 
             struct appdata
             {
                 float4 vertex : POSITION;
             };
-
             struct v2f
             {
                 float4 pos : SV_POSITION;
                 float3 worldPos : TEXCOORD0;
-                float3 objectPos : TEXCOORD1;
             };
 
-            v2f vert (appdata v)
+            v2f vert(appdata v)
             {
                 v2f o;
+                float4 wp = mul(unity_ObjectToWorld, v.vertex);
+                o.worldPos = wp.xyz;
                 o.pos = UnityObjectToClipPos(v.vertex);
-                o.worldPos = mul(unity_ObjectToWorld, v.vertex).xyz;
-                o.objectPos = v.vertex.xyz;
                 return o;
             }
 
-            // Ray-Box intersection
-            bool RayBoxIntersection(float3 rayOrigin, float3 rayDir, float3 boxMin, float3 boxMax, out float tNear, out float tFar)
+            bool RayBox(float3 ro, float3 rd, float3 bmin, float3 bmax, out float tmin, out float tmax)
             {
-                float3 invDir = 1.0 / rayDir;
-                float3 t0 = (boxMin - rayOrigin) * invDir;
-                float3 t1 = (boxMax - rayOrigin) * invDir;
-                
-                float3 tMin = min(t0, t1);
-                float3 tMax = max(t0, t1);
-                
-                tNear = max(max(tMin.x, tMin.y), tMin.z);
-                tFar = min(min(tMax.x, tMax.y), tMax.z);
-                
-                return tFar > tNear && tFar > 0;
+                float3 inv = 1.0 / rd;
+                float3 t0 = (bmin - ro) * inv;
+                float3 t1 = (bmax - ro) * inv;
+                float3 tsmaller = min(t0, t1);
+                float3 tbigger  = max(t0, t1);
+                tmin = max(tsmaller.x, max(tsmaller.y, tsmaller.z));
+                tmax = min(tbigger.x,  min(tbigger.y,  tbigger.z));
+                return tmax > max(tmin, 0.0);
             }
 
-            fixed4 frag (v2f i) : SV_Target
+            fixed4 frag(v2f i) : SV_Target
             {
-                // Configurar o raio em object space
-                float3 rayOrigin = mul(unity_WorldToObject, float4(_WorldSpaceCameraPos, 1)).xyz;
-                float3 rayDir = normalize(i.objectPos - rayOrigin);
-                
-                // Bounding box do cubo em object space (-0.5 a 0.5)
-                float3 boxMin = float3(-0.5, -0.5, -0.5);
-                float3 boxMax = float3(0.5, 0.5, 0.5);
-                
-                float tNear, tFar;
-                if (!RayBoxIntersection(rayOrigin, rayDir, boxMin, boxMax, tNear, tFar))
-                {
+                float3 ro = _WorldSpaceCameraPos;
+                float3 rd = normalize(i.worldPos - ro);
+
+                float t0, t1;
+                if (!RayBox(ro, rd, _BoundsMin, _BoundsMin + _BoundsSize, t0, t1))
                     discard;
-                }
-                
-                // Começar de dentro do box se a câmera estiver dentro
-                tNear = max(tNear, 0);
-                
-                // Ray marching
-                float stepSize = (tFar - tNear) / float(_StepCount);
-                float3 currentPos = rayOrigin + rayDir * tNear;
-                
-                float4 finalColor = float4(0, 0, 0, 0);
-                
-                for (int step = 0; step < _StepCount; step++)
+
+                t0 = max(t0, 0.0);
+                float dist = t1 - t0;
+
+                int steps = max(4, _Steps);
+                float stepSize = dist / steps;
+                float3 startPos = ro + rd * t0;
+
+                float3 accum = 0;
+                float transmittance = 1.0;
+                float3 boxColor = _CloudColor.rgb;
+
+                // Substitua o loop no fragment shader:
+                for (int s = 0; s < steps; s++)
                 {
-                    // Converter object space (-0.5 a 0.5) para texture space (0 a 1)
-                    float3 uvw = currentPos + 0.5;
-                    
-                    // Verificar se está dentro do volume
-                    if (all(uvw >= 0) && all(uvw <= 1))
-                    {
-                        float density = tex3Dlod(_DensityTex, float4(uvw, 0)).r;
-                        
-                        if (density > 0.001)
-                        {
-                            // Cor da fumaça/nuvem
-                            float3 color = float3(1, 1, 1) * density * _Intensity;
-                            float alpha = density * _Intensity * stepSize * 100;
-                            
-                            // Composição alpha blending (front-to-back)
-                            finalColor.rgb += color * alpha * (1.0 - finalColor.a);
-                            finalColor.a += alpha * (1.0 - finalColor.a);
-                            
-                            // Early exit se já estiver opaco
-                            if (finalColor.a >= 0.95)
-                                break;
-                        }
-                    }
-                    
-                    currentPos += rayDir * stepSize;
+                  float3 p = startPos + rd * (s * stepSize + stepSize * 0.5); // Offset central
+                  float3 uvw = (p - _BoundsMin) / _BoundsSize;
+                  uvw = saturate(uvw);
+
+                  float density = tex3Dlod(_DensityTex, float4(uvw, 0)).r;
+
+                  if (density > 0.001) // Threshold maior
+                  {
+                    // Beer-Lambert law
+                    float sigma_t = density * _Extinction;
+                    float absorb = exp(-sigma_t * stepSize);
+
+                    // In-scattering (phase function simplificada)
+                    float3 luminance = boxColor * density;
+
+                    accum += transmittance * (1.0 - absorb) * luminance * stepSize;
+                    transmittance *= absorb;
+
+                    if (transmittance < 0.01) break;
+                  }
                 }
-                
-                return saturate(finalColor);
+
+                float alpha = 1 - transmittance;
+
+                // Optional debug: show bounding box edges
+                if (_DebugBounds == 1)
+                {
+                    float3 rel = (i.worldPos - (_BoundsMin + 0.5*_BoundsSize)) / (_BoundsSize * 0.5);
+                    float edge = step(0.95, max(abs(rel.x), max(abs(rel.y), abs(rel.z))));
+                    accum = lerp(accum, float3(1,0,0), edge);
+                    alpha = max(alpha, edge * 0.3);
+                }
+
+                return float4(accum, alpha);
             }
             ENDCG
         }
     }
+    FallBack Off
 }

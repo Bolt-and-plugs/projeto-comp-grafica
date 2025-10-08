@@ -1,2 +1,13 @@
 fileFormatVersion: 2
 guid: 527f67b000424594a8eb5c0b74bdc6d5
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - computeShader: {fileID: 7200000, guid: d2552977336ad0b888d5ca8694d06b35, type: 3}
+  - rayMarchMaterial: {fileID: 2100000, guid: b298d5f94c0bc1f438d66f252e84378f, type: 2}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

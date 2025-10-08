@@ -1,79 +1,174 @@
+#pragma kernel InitVelocityKernel
+#pragma kernel InjectKernel
+#pragma kernel AddSourceKernel
+#pragma kernel AddVelocitySourceKernel
 #pragma kernel AdvectKernel
 #pragma kernel DiffuseKernel
+#pragma kernel DissipateKernel
+#pragma kernel SetBoundaryKernel
 
-// --- Global Variables ---
-// These are set by the C# script
-
-// A sampler for smooth interpolation between grid cells
+// Sampler for filtered sampling of 3D textures
 SamplerState sampler_linear_clamp;
 
-// Grid dimensions and time step
-float3 gridSize;
-float deltaTime;
+// Grid dimensions (xyz) and dt
+float4 gridSize;     // xyz used
+float  deltaTime;
+float dissipation; // For density dissipation
 
-// --- Advection Kernel Variables ---
-Texture3D<float4> velocityRead; // 3D Vector field for velocity
-Texture3D<float> densityRead;   // Scalar field for density
-RWTexture3D<float> densityWrite; // Output texture
+// ---------------- Velocity ----------------
+RWTexture3D<float4> velocityWrite;  // For initialization / velocity sources
+Texture3D<float4>  velocityRead;    // For advection stage
 
-// --- Diffusion Kernel Variables ---
-// Note: These can reuse the densityRead/Write textures from C#,
-// but are named generically here for clarity.
-Texture3D<float> bufferRead;
-Texture3D<float> initialBuffer;
+// ---------------- Density -----------------
+Texture3D<float>   densityRead;
+RWTexture3D<float> densityWrite;
+
+// ---------------- Diffusion ---------------
+Texture3D<float>   bufferRead;
+Texture3D<float>   initialBuffer;
 RWTexture3D<float> bufferWrite;
 float alpha;
 float rBeta;
 
+// ---------------- Inject (procedural sphere) -------------
+float3 injectPos;
+float  injectRadius;
+float  injectValue;
 
-// --- Kernels ---
+// ---------------- Add Source (generic textures) ----------
+Texture3D<float>   sourceDensity;
+float              sourceScale = 1.0;
 
-// AdvectKernel: Moves density along the velocity field
-[numthreads(8, 8, 8)]
+Texture3D<float4>  sourceVelocity;
+float              velocitySourceScale = 1.0;
+
+// ---------------- Init --------------------
+float3 initialVelocity;
+
+// Utility: bounds check
+bool InBounds(uint3 id, float3 size)
+{
+    return !(id.x >= size.x || id.y >= size.y || id.z >= size.z);
+}
+
+// Initialize velocity field to a constant vector
+[numthreads(8,8,8)]
+void InitVelocityKernel(uint3 id : SV_DispatchThreadID)
+{
+    float3 size = gridSize.xyz;
+    if (!InBounds(id, size)) return;
+    velocityWrite[id] = float4(initialVelocity, 0);
+}
+
+// Procedural spherical density injection
+[numthreads(8,8,8)]
+void InjectKernel(uint3 id : SV_DispatchThreadID)
+{
+    float3 size = gridSize.xyz;
+    if (!InBounds(id, size)) return;
+
+    float3 p = id;
+    float d  = distance(p, injectPos);
+    if (d < injectRadius)
+    {
+        float falloff = 1 - (d / injectRadius);
+        float prev = densityWrite[id];
+        densityWrite[id] = max(prev, injectValue * falloff);
+    }
+}
+
+// Adds a (pre-baked) source density texture into the current density (Stable Fluids add_source analog)
+[numthreads(8,8,8)]
+void AddSourceKernel(uint3 id : SV_DispatchThreadID)
+{
+    float3 size = gridSize.xyz;
+    if (!InBounds(id, size)) return;
+
+    float prev  = densityWrite[id];
+    float addVal = sourceDensity[id] * sourceScale * deltaTime;
+    densityWrite[id] = prev + addVal;
+}
+
+// Adds a velocity source texture (optional)
+[numthreads(8,8,8)]
+void AddVelocitySourceKernel(uint3 id : SV_DispatchThreadID)
+{
+    float3 size = gridSize.xyz;
+    if (!InBounds(id, size)) return;
+
+    float4 prev = velocityWrite[id];
+    float4 addv = sourceVelocity[id] * velocitySourceScale * deltaTime;
+    velocityWrite[id] = float4(prev.xyz + addv.xyz, 0);
+}
+
+// Semi-Lagrangian advection for density
+[numthreads(8,8,8)]
 void AdvectKernel(uint3 id : SV_DispatchThreadID)
 {
-    // 1. Get the velocity at the current grid cell's center
-    // We normalize the coordinates to the 0-1 range for sampling
-    float3 pos = (id + 0.5f) / gridSize;
-    float3 vel = velocityRead.SampleLevel(sampler_linear_clamp, pos, 0).xyz;
+    float3 size = gridSize.xyz;
+    if (!InBounds(id, size)) return;
 
-    // 2. Calculate the previous position by tracing backwards in time
-    float3 previousPos = float3(id.x, id.y, id.z) - vel * deltaTime;
+    // Normalized coords to sample velocity
+    float3 coord = (id + 0.5) / size;
+    float3 vel = velocityRead.SampleLevel(sampler_linear_clamp, coord, 0).xyz;
 
-    // 3. Sample the density from that previous position (interpolated)
-    float3 previousPosNormalized = (previousPos + 0.5f) / gridSize;
-    float advectedDensity = densityRead.SampleLevel(sampler_linear_clamp, previousPosNormalized, 0);
+    // Backtrace
+    float3 previous = (float3)id - vel * deltaTime;
+    previous = clamp(previous, 0.0.xxx, size - 1.001.xxx);
 
-    // 4. Write the result to the output grid
-    densityWrite[id] = advectedDensity;
+    float3 prevNorm = (previous + 0.5) / size;
+    float d = densityRead.SampleLevel(sampler_linear_clamp, prevNorm, 0);
+
+    densityWrite[id] = d;
 }
 
-
-// DiffuseKernel: Spreads the density out over time
-[numthreads(8, 8, 8)]
+// Simple Jacobi diffusion iteration
+[numthreads(8,8,8)]
 void DiffuseKernel(uint3 id : SV_DispatchThreadID)
 {
-    // Prevent reading out of bounds (simple clamp)
-    if (id.x >= gridSize.x - 1 || id.y >= gridSize.y - 1 || id.z >= gridSize.z - 1 ||
-        id.x < 1 || id.y < 1 || id.z < 1) {
+    float3 size = gridSize.xyz;
+    // Skip boundary
+    if (id.x < 1 || id.y < 1 || id.z < 1 ||
+        id.x >= size.x - 1 || id.y >= size.y - 1 || id.z >= size.z - 1)
         return;
-    }
 
-    // 1. Sample the six direct neighbors from the previous iteration's buffer
-    float neighborSum =
-        bufferRead[id + uint3(-1, 0, 0)] +
-        bufferRead[id + uint3(1, 0, 0)] +
-        bufferRead[id + uint3(0, -1, 0)] +
-        bufferRead[id + uint3(0, 1, 0)] +
-        bufferRead[id + uint3(0, 0, -1)] +
-        bufferRead[id + uint3(0, 0, 1)];
+    float sumN =
+        bufferRead[id + uint3(-1,0,0)] +
+        bufferRead[id + uint3( 1,0,0)] +
+        bufferRead[id + uint3(0,-1,0)] +
+        bufferRead[id + uint3(0, 1,0)] +
+        bufferRead[id + uint3(0,0,-1)] +
+        bufferRead[id + uint3(0,0, 1)];
 
-    // 2. Get the value from the initial state of the buffer (before this solve started)
-    float initialValue = initialBuffer[id];
-
-    // 3. Apply the Jacobi iteration formula to solve for the new value
-    float diffusedValue = (neighborSum + alpha * initialValue) * rBeta;
-
-    // 4. Write the result for this single iteration
-    bufferWrite[id] = diffusedValue;
+    float initVal = initialBuffer[id];
+    float val = (sumN + alpha * initVal) * rBeta;
+    bufferWrite[id] = val;
 }
+
+
+[numthreads(8,8,8)]
+void DissipateKernel(uint3 id : SV_DispatchThreadID)
+{
+    float3 size = gridSize.xyz;
+    if (!InBounds(id, size)) return;
+    
+    float current = densityWrite[id];
+    densityWrite[id] = current * dissipation;
+}
+
+
+// Sets density to zero on the boundaries
+[numthreads(8,8,8)]
+void SetBoundaryKernel(uint3 id : SV_DispatchThreadID)
+{
+    float3 size = gridSize.xyz;
+    if (!InBounds(id, size)) return;
+    
+    // Zero nas bordas
+    if (id.x == 0 || id.y == 0 || id.z == 0 ||
+        id.x >= size.x - 1 || id.y >= size.y - 1 || id.z >= size.z - 1)
+    {
+        densityWrite[id] = 0.0;
+    }
+}
+
