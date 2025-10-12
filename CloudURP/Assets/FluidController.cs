@@ -63,7 +63,7 @@ public class FluidController : MonoBehaviour
     public MeshRenderer volumeRenderer;
     public int rayMarchSteps = 64;
     public Color cloudColor = new Color(1.0f, 1.0f, 1.0f);
-    public Color darkCloudColor = new Color(0.5f, 0.5f, 0.5f);
+    public Color darkCloudColor = new Color(0.75f, 0.75f, 0.75f); // Mais claro para evitar bordas pretas
     
     [Range(0f, 2f)]
     public float absorption = 0.5f;

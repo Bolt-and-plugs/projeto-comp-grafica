@@ -128,10 +128,10 @@ Shader "Custom/RayMarchShader"
                         // Absorção simples
                         float absorb = exp(-density * _Absorption * stepSize);
                         
-                        // Cor baseada na densidade acumulada - SUAVIZADO
-                        // Menos contraste nas bordas
-                        float lightFactor = exp(-densityAccum * 0.25); // Era 0.5, agora 0.25
-                        lightFactor = lerp(0.5, 1.0, lightFactor); // Garante mínimo de 0.5
+                        // Cor baseada na densidade acumulada - SUAVIZAÇÃO MÁXIMA
+                        // Usar pow em vez de exp para controle mais fino
+                        float lightFactor = pow(1.0 - saturate(densityAccum * 0.15), 2.0);
+                        lightFactor = lerp(0.7, 1.0, lightFactor); // Mínimo de 70% de luz
                         float3 cloudColor = lerp(_DarkColor.rgb, _CloudColor.rgb, lightFactor);
                         
                         // Acumular cor
