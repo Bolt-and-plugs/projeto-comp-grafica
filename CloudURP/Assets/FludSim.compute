@@ -5,6 +5,7 @@
 #pragma kernel AdvectKernel
 #pragma kernel DiffuseKernel
 #pragma kernel SetBoundaryKernel
+#pragma kernel LifecycleKernel
 
 // Sampler for filtered sampling of 3D textures
 SamplerState sampler_linear_clamp;
@@ -42,6 +43,9 @@ float              velocitySourceScale = 1.0;
 
 // ---------------- Init --------------------
 float3 initialVelocity;
+
+// ---------------- Lifecycle ----------------
+float decayRate; // How fast density fades (0.0 - 1.0)
 
 // Utility: bounds check
 bool InBounds(uint3 id, float3 size)
@@ -132,7 +136,11 @@ void AddSourceKernel(uint3 id : SV_DispatchThreadID)
 
     float prev  = densityWrite[id];
     float addVal = sourceDensity[id] * sourceScale * deltaTime;
-    densityWrite[id] = prev + addVal;
+    
+    // Limit maximum density to prevent infinite accumulation
+    const float maxDensity = 1.5;
+    float newDensity = prev + addVal;
+    densityWrite[id] = min(newDensity, maxDensity);
 }
 
 // Adds a velocity source texture (optional)
@@ -206,3 +214,23 @@ void SetBoundaryKernel(uint3 id : SV_DispatchThreadID)
     }
 }
 
+// Lifecycle: decay density over time
+[numthreads(8,8,8)]
+void LifecycleKernel(uint3 id : SV_DispatchThreadID)
+{
+    float3 size = gridSize.xyz;
+    if (!InBounds(id, size)) return;
+    
+    float currentDensity = densityWrite[id];
+    
+    // Exponential decay over time
+    float decay = exp(-decayRate * deltaTime);
+    float newDensity = currentDensity * decay;
+    
+    // Force to zero if below threshold (prevents floating point accumulation)
+    const float threshold = 0.001;
+    if (newDensity < threshold)
+        newDensity = 0.0;
+    
+    densityWrite[id] = newDensity;
+}

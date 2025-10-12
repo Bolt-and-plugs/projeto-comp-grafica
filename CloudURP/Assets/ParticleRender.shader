@@ -128,8 +128,10 @@ Shader "Custom/RayMarchShader"
                         // Absorção simples
                         float absorb = exp(-density * _Absorption * stepSize);
                         
-                        // Cor baseada na densidade acumulada (mais escuro no interior)
-                        float lightFactor = exp(-densityAccum * 0.5);
+                        // Cor baseada na densidade acumulada - SUAVIZADO
+                        // Menos contraste nas bordas
+                        float lightFactor = exp(-densityAccum * 0.25); // Era 0.5, agora 0.25
+                        lightFactor = lerp(0.5, 1.0, lightFactor); // Garante mínimo de 0.5
                         float3 cloudColor = lerp(_DarkColor.rgb, _CloudColor.rgb, lightFactor);
                         
                         // Acumular cor
@@ -164,5 +166,5 @@ Shader "Custom/RayMarchShader"
             ENDHLSL
         }
     }
-    FallBack "Hidden/Universal Render Pipeline/FallbackError"
+    FallBack Off
 }

@@ -19,9 +19,16 @@ public class FluidController : MonoBehaviour
     public float diffusionRate = 0.05f;
     [Tooltip("Jacobi iterations for diffusion (more = smoother but slower).")]
     public int diffusionIterations = 15;
+    
+    [Tooltip("Density decay rate over time (0 = no decay, 1 = fast decay).")]
+    [Range(0f, 5f)]
+    public float decayRate = 0.5f;
 
     [Header("Velocity Init / Sources")]
     public Vector3 initialVelocity = new Vector3(0, 0.25f, 0);
+    
+    [Tooltip("Apply velocity uniformly across entire volume (better movement)")]
+    public bool uniformVelocity = true;
 
     [Header("Procedural Injection (Hold Space)")]
     public float injectRadius = 20f;
@@ -30,6 +37,15 @@ public class FluidController : MonoBehaviour
     [Header("Generic Source (Prebaked)")]
     public bool addConstantSource = true;
     public float sourceScale = 1.0f;
+    
+    [Tooltip("Only add source where density is low (prevents infinite accumulation)")]
+    public bool smartSourceInjection = true;
+    
+    [Tooltip("Time in seconds for source injection cycle (high = slower cycle)")]
+    [Range(5f, 60f)]
+    public float sourceCycleTime = 20f;
+    
+    private float sourceTimer = 0f;
     
     [Tooltip("Number of cloud spheres to generate")]
     [Range(1, 10)]
@@ -67,6 +83,7 @@ public class FluidController : MonoBehaviour
     private int kAddSource = -1;
     private int kAdvect = -1;
     private int kDiffuse = -1;
+    private int kLifecycle = -1;
 
     // Cached bounds
     private Vector3 boundsMin;
@@ -128,7 +145,27 @@ public class FluidController : MonoBehaviour
         //  source (add_source stage)
         if (kAddSource >= 0 && addConstantSource && densitySource)
         {
-            computeShader.SetFloat("sourceScale", sourceScale);
+            float currentSourceScale = sourceScale;
+            
+            // Smooth cycling: inject strongly at start, fade out, then reset
+            if (smartSourceInjection)
+            {
+                sourceTimer += dt;
+                
+                // Calculate smooth fade using cosine curve
+                float cycleProgress = sourceTimer / sourceCycleTime;
+                if (cycleProgress >= 1.0f)
+                {
+                    sourceTimer = 0f;
+                    cycleProgress = 0f;
+                }
+                
+                // Fade from 1.0 to 0.0 smoothly over the cycle
+                float fadeAmount = Mathf.Cos(cycleProgress * Mathf.PI) * 0.5f + 0.5f;
+                currentSourceScale *= fadeAmount;
+            }
+            
+            computeShader.SetFloat("sourceScale", currentSourceScale);
             computeShader.SetTexture(kAddSource, "densityWrite", densityA);
             computeShader.SetTexture(kAddSource, "sourceDensity", densitySource);
             DispatchFull(kAddSource);
@@ -153,6 +190,14 @@ public class FluidController : MonoBehaviour
         // 3. Advection: densityA -> densityB
         if (kAdvect >= 0)
         {
+            // Re-initialize velocity every frame if uniform velocity is enabled
+            if (uniformVelocity && kInitVelocity >= 0)
+            {
+                computeShader.SetVector("initialVelocity", initialVelocity);
+                computeShader.SetTexture(kInitVelocity, "velocityWrite", velocity);
+                DispatchFull(kInitVelocity);
+            }
+            
             computeShader.SetTexture(kAdvect, "velocityRead", velocity);
             computeShader.SetTexture(kAdvect, "densityRead", densityA);
             computeShader.SetTexture(kAdvect, "densityWrite", densityB);
@@ -179,8 +224,16 @@ public class FluidController : MonoBehaviour
                 Swap(ref densityA, ref densityB);
             }
         }
+        
+        // 5. Lifecycle: decay density over time
+        if (kLifecycle >= 0 && decayRate > 0)
+        {
+            computeShader.SetFloat("decayRate", decayRate);
+            computeShader.SetTexture(kLifecycle, "densityWrite", densityA);
+            DispatchFull(kLifecycle);
+        }
 
-        // 5. Update material
+        // 6. Update material
         if (rayMarchMaterial)
         {
             rayMarchMaterial.SetTexture("_DensityTex", densityA);
@@ -236,6 +289,7 @@ public class FluidController : MonoBehaviour
         kAddSource    = SafeFind("AddSourceKernel");
         kAdvect       = SafeFind("AdvectKernel");
         kDiffuse      = SafeFind("DiffuseKernel");
+        kLifecycle    = SafeFind("LifecycleKernel");
     }
 
     int SafeFind(string kernel)
