@@ -3,58 +3,83 @@ Shader "Custom/RayMarchShader"
     Properties
     {
         _DensityTex ("Density Texture", 3D) = "" {}
-        _CloudColor ("Cloud Color", Color) = (0.85,0.9,1,1)
-        _Extinction ("Extinction", Float) = 1.5
-        _Steps ("Ray March Steps", Int) = 96
+        _CloudColor ("Cloud Color", Color) = (1, 1, 1, 1)
+        _DarkColor ("Dark Cloud Color", Color) = (0.5, 0.5, 0.5, 1)
+        _Absorption ("Absorption", Range(0, 2)) = 0.5
+        _Steps ("Ray March Steps", Int) = 64
         _DebugBounds ("Debug Bounds", Int) = 0
     }
     SubShader
     {
-        Tags { "Queue"="Transparent" "RenderType"="Transparent" }
+        Tags 
+        { 
+            "RenderType" = "Transparent"
+            "Queue" = "Transparent"
+            "RenderPipeline" = "UniversalPipeline"
+        }
+        
+        LOD 100
         Blend SrcAlpha OneMinusSrcAlpha
         Cull Off
         ZWrite Off
 
         Pass
         {
-            CGPROGRAM
+            Name "VolumetricRayMarch"
+            Tags { "LightMode" = "UniversalForward" }
+
+            HLSLPROGRAM
             #pragma vertex vert
             #pragma fragment frag
-            #pragma target 4.0
+            #pragma target 4.5
+            #pragma multi_compile_fog
 
-            #include "UnityCG.cginc"
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
 
-            sampler3D _DensityTex;
-            float3 _GridSize;
-            float3 _BoundsMin;
-            float3 _BoundsSize;
-            float4 _CloudColor;    // rgb used
-            float  _Extinction;
-            int    _Steps;
-            int    _DebugBounds;
+            // Texture and Sampler
+            TEXTURE3D(_DensityTex);
+            SAMPLER(sampler_DensityTex);
 
-            struct appdata
+            // Properties
+            CBUFFER_START(UnityPerMaterial)
+                float3 _GridSize;
+                float3 _BoundsMin;
+                float3 _BoundsSize;
+                float4 _CloudColor;
+                float4 _DarkColor;
+                float  _Absorption;
+                int    _Steps;
+                int    _DebugBounds;
+            CBUFFER_END
+
+            struct Attributes
             {
-                float4 vertex : POSITION;
+                float4 positionOS : POSITION;
             };
-            struct v2f
+
+            struct Varyings
             {
-                float4 pos : SV_POSITION;
-                float3 worldPos : TEXCOORD0;
+                float4 positionCS : SV_POSITION;
+                float3 positionWS : TEXCOORD0;
+                float fogFactor : TEXCOORD1;
             };
 
-            v2f vert(appdata v)
+            Varyings vert(Attributes input)
             {
-                v2f o;
-                float4 wp = mul(unity_ObjectToWorld, v.vertex);
-                o.worldPos = wp.xyz;
-                o.pos = UnityObjectToClipPos(v.vertex);
-                return o;
+                Varyings output;
+                
+                VertexPositionInputs vertexInput = GetVertexPositionInputs(input.positionOS.xyz);
+                output.positionCS = vertexInput.positionCS;
+                output.positionWS = vertexInput.positionWS;
+                output.fogFactor = ComputeFogFactor(output.positionCS.z);
+                
+                return output;
             }
 
             bool RayBox(float3 ro, float3 rd, float3 bmin, float3 bmax, out float tmin, out float tmax)
             {
-                float3 inv = 1.0 / rd;
+                float3 inv = 1.0 / (rd + 1e-6); // Add epsilon to avoid division by zero
                 float3 t0 = (bmin - ro) * inv;
                 float3 t1 = (bmax - ro) * inv;
                 float3 tsmaller = min(t0, t1);
@@ -64,66 +89,80 @@ Shader "Custom/RayMarchShader"
                 return tmax > max(tmin, 0.0);
             }
 
-            fixed4 frag(v2f i) : SV_Target
+            half4 frag(Varyings input) : SV_Target
             {
                 float3 ro = _WorldSpaceCameraPos;
-                float3 rd = normalize(i.worldPos - ro);
+                float3 rd = normalize(input.positionWS - ro);
 
                 float t0, t1;
                 if (!RayBox(ro, rd, _BoundsMin, _BoundsMin + _BoundsSize, t0, t1))
+                {
                     discard;
+                }
 
                 t0 = max(t0, 0.0);
                 float dist = t1 - t0;
 
                 int steps = max(4, _Steps);
-                float stepSize = dist / steps;
+                float stepSize = dist / (float)steps;
                 float3 startPos = ro + rd * t0;
 
-                float3 accum = 0;
+                float3 accum = 0.0;
                 float transmittance = 1.0;
-                float3 boxColor = _CloudColor.rgb;
+                float densityAccum = 0.0;
 
-                // Substitua o loop no fragment shader:
+                // Ray marching loop simples
                 for (int s = 0; s < steps; s++)
                 {
-                  float3 p = startPos + rd * (s * stepSize + stepSize * 0.5); // Offset central
-                  float3 uvw = (p - _BoundsMin) / _BoundsSize;
-                  uvw = saturate(uvw);
+                    float3 p = startPos + rd * ((float)s * stepSize + stepSize * 0.5);
+                    float3 uvw = (p - _BoundsMin) / _BoundsSize;
+                    uvw = saturate(uvw);
 
-                  float density = tex3Dlod(_DensityTex, float4(uvw, 0)).r;
+                    // Sample densidade da textura 3D
+                    float density = SAMPLE_TEXTURE3D_LOD(_DensityTex, sampler_DensityTex, uvw, 0).r;
 
-                  if (density > 0.001) // Threshold maior
-                  {
-                    // Beer-Lambert law
-                    float sigma_t = density * _Extinction;
-                    float absorb = exp(-sigma_t * stepSize);
+                    if (density > 0.01)
+                    {
+                        densityAccum += density * stepSize;
+                        
+                        // Absorção simples
+                        float absorb = exp(-density * _Absorption * stepSize);
+                        
+                        // Cor baseada na densidade acumulada (mais escuro no interior)
+                        float lightFactor = exp(-densityAccum * 0.5);
+                        float3 cloudColor = lerp(_DarkColor.rgb, _CloudColor.rgb, lightFactor);
+                        
+                        // Acumular cor
+                        accum += transmittance * (1.0 - absorb) * cloudColor * density;
+                        transmittance *= absorb;
 
-                    // In-scattering (phase function simplificada)
-                    float3 luminance = boxColor * density;
-
-                    accum += transmittance * (1.0 - absorb) * luminance * stepSize;
-                    transmittance *= absorb;
-
-                    if (transmittance < 0.01) break;
-                  }
+                        // Early termination
+                        if (transmittance < 0.01)
+                            break;
+                    }
                 }
 
-                float alpha = 1 - transmittance;
+                float alpha = 1.0 - transmittance;
 
                 // Optional debug: show bounding box edges
                 if (_DebugBounds == 1)
                 {
-                    float3 rel = (i.worldPos - (_BoundsMin + 0.5*_BoundsSize)) / (_BoundsSize * 0.5);
+                    float3 rel = (input.positionWS - (_BoundsMin + 0.5 * _BoundsSize)) / (_BoundsSize * 0.5);
                     float edge = step(0.95, max(abs(rel.x), max(abs(rel.y), abs(rel.z))));
-                    accum = lerp(accum, float3(1,0,0), edge);
+                    accum = lerp(accum, float3(1, 0, 0), edge);
                     alpha = max(alpha, edge * 0.3);
                 }
 
-                return float4(accum, alpha);
+                // Apply fog
+                accum = MixFog(accum, input.fogFactor);
+                
+                // Fade alpha para evitar bordas duras
+                alpha = saturate(alpha);
+
+                return half4(accum, alpha);
             }
-            ENDCG
+            ENDHLSL
         }
     }
-    FallBack Off
+    FallBack "Hidden/Universal Render Pipeline/FallbackError"
 }

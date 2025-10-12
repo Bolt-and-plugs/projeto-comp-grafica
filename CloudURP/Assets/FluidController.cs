@@ -30,13 +30,28 @@ public class FluidController : MonoBehaviour
     [Header("Generic Source (Prebaked)")]
     public bool addConstantSource = true;
     public float sourceScale = 1.0f;
+    
+    [Tooltip("Number of cloud spheres to generate")]
+    [Range(1, 10)]
+    public int cloudCount = 3;
+    
+    [Tooltip("Radius of each cloud sphere")]
+    [Range(5f, 40f)]
+    public float cloudRadius = 15f;
+    
+    [Tooltip("Use layered clouds instead of random spheres")]
+    public bool useLayeredClouds = false;
 
     [Header("Rendering")]
     public Material rayMarchMaterial;
     public MeshRenderer volumeRenderer;
-    public int rayMarchSteps = 96;
-    public float extinction = 1.5f;
-    public Color cloudColor = new Color(0.85f, 0.9f, 1.0f);
+    public int rayMarchSteps = 64;
+    public Color cloudColor = new Color(1.0f, 1.0f, 1.0f);
+    public Color darkCloudColor = new Color(0.5f, 0.5f, 0.5f);
+    
+    [Range(0f, 2f)]
+    public float absorption = 0.5f;
+    
     public bool debugBounds = false;
 
     // Internal RenderTextures
@@ -91,6 +106,13 @@ public class FluidController : MonoBehaviour
 
         UpdateBoundsFromTransform();
         PushStaticRenderParams();
+        
+        // Disable shadow casting for volumetric rendering
+        if (volumeRenderer)
+        {
+            volumeRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            volumeRenderer.receiveShadows = false;
+        }
     }
 
     void Update()
@@ -165,8 +187,9 @@ public class FluidController : MonoBehaviour
             rayMarchMaterial.SetVector("_GridSize", (Vector3)gridSize);
             rayMarchMaterial.SetVector("_BoundsMin", boundsMin);
             rayMarchMaterial.SetVector("_BoundsSize", boundsSize);
-            rayMarchMaterial.SetFloat("_Extinction", extinction);
             rayMarchMaterial.SetColor("_CloudColor", cloudColor);
+            rayMarchMaterial.SetColor("_DarkColor", darkCloudColor);
+            rayMarchMaterial.SetFloat("_Absorption", absorption);
             rayMarchMaterial.SetInt("_Steps", Mathf.Max(4, rayMarchSteps));
             rayMarchMaterial.SetInt("_DebugBounds", debugBounds ? 1 : 0);
         }
@@ -248,7 +271,7 @@ public class FluidController : MonoBehaviour
         }
     }
 
-    // One-time build of a sphere density source using the InjectKernel
+    // One-time build of multiple cloud spheres using the InjectKernel
     void CreateSourceTexture()
     {
         var desc = new RenderTextureDescriptor(gridSize.x, gridSize.y, RenderTextureFormat.RFloat, 0)
@@ -267,12 +290,65 @@ public class FluidController : MonoBehaviour
 
         if (kInject >= 0)
         {
-            computeShader.SetVector("injectPos",
-                new Vector3(gridSize.x * 0.5f, gridSize.y * 0.5f, gridSize.z * 0.5f));
-            computeShader.SetFloat("injectRadius", Mathf.Min(gridSize.x, gridSize.y, gridSize.z) * 0.25f);
-            computeShader.SetFloat("injectValue", 1.0f);
-            computeShader.SetTexture(kInject, "densityWrite", densitySource);
-            DispatchFull(kInject);
+            System.Random rand = new System.Random(42); // Fixed seed for consistency
+            
+            if (useLayeredClouds)
+            {
+                // Create layered cloud formation (more realistic)
+                int layerCount = cloudCount * 2;
+                for (int i = 0; i < layerCount; i++)
+                {
+                    float xRange = gridSize.x * 0.8f;
+                    float zRange = gridSize.z * 0.8f;
+                    
+                    float x = gridSize.x * 0.5f + ((float)rand.NextDouble() - 0.5f) * xRange;
+                    float y = gridSize.y * 0.25f + (float)rand.NextDouble() * gridSize.y * 0.35f;
+                    float z = gridSize.z * 0.5f + ((float)rand.NextDouble() - 0.5f) * zRange;
+                    
+                    // Flatter clouds (ellipsoid)
+                    float radiusXZ = cloudRadius * (0.8f + (float)rand.NextDouble() * 0.6f);
+                    float radiusY = radiusXZ * 0.5f; // Flatter
+                    
+                    // Use average radius for now (proper ellipsoid would need shader change)
+                    float avgRadius = (radiusXZ + radiusY) * 0.5f;
+                    
+                    float densityVariation = 0.6f + (float)rand.NextDouble() * 0.5f;
+                    
+                    computeShader.SetVector("injectPos", new Vector3(x, y, z));
+                    computeShader.SetFloat("injectRadius", avgRadius);
+                    computeShader.SetFloat("injectValue", densityVariation);
+                    computeShader.SetTexture(kInject, "densityWrite", densitySource);
+                    DispatchFull(kInject);
+                }
+            }
+            else
+            {
+                // Generate multiple cloud spheres at random positions
+                for (int i = 0; i < cloudCount; i++)
+                {
+                    // Random position within the volume, biased toward center
+                    float xRange = gridSize.x * 0.6f;
+                    float yRange = gridSize.y * 0.4f;
+                    float zRange = gridSize.z * 0.6f;
+                    
+                    float x = gridSize.x * 0.5f + ((float)rand.NextDouble() - 0.5f) * xRange;
+                    float y = gridSize.y * 0.3f + (float)rand.NextDouble() * yRange; // Bias toward lower
+                    float z = gridSize.z * 0.5f + ((float)rand.NextDouble() - 0.5f) * zRange;
+                    
+                    // Vary the size slightly
+                    float sizeVariation = 0.7f + (float)rand.NextDouble() * 0.6f; // 0.7 to 1.3
+                    float radius = cloudRadius * sizeVariation;
+                    
+                    // Vary the density slightly
+                    float densityVariation = 0.8f + (float)rand.NextDouble() * 0.4f; // 0.8 to 1.2
+                    
+                    computeShader.SetVector("injectPos", new Vector3(x, y, z));
+                    computeShader.SetFloat("injectRadius", radius);
+                    computeShader.SetFloat("injectValue", densityVariation);
+                    computeShader.SetTexture(kInject, "densityWrite", densitySource);
+                    DispatchFull(kInject);
+                }
+            }
         }
     }
 

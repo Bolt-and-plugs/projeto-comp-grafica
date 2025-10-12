@@ -49,6 +49,44 @@ bool InBounds(uint3 id, float3 size)
     return !(id.x >= size.x || id.y >= size.y || id.z >= size.z);
 }
 
+// Simple hash for procedural noise
+float hash(float3 p)
+{
+    p = frac(p * 0.3183099 + 0.1);
+    p *= 17.0;
+    return frac(p.x * p.y * p.z * (p.x + p.y + p.z));
+}
+
+// 3D noise function
+float noise(float3 x)
+{
+    float3 p = floor(x);
+    float3 f = frac(x);
+    f = f * f * (3.0 - 2.0 * f);
+    
+    return lerp(
+        lerp(lerp(hash(p), hash(p + float3(1,0,0)), f.x),
+             lerp(hash(p + float3(0,1,0)), hash(p + float3(1,1,0)), f.x), f.y),
+        lerp(lerp(hash(p + float3(0,0,1)), hash(p + float3(1,0,1)), f.x),
+             lerp(hash(p + float3(0,1,1)), hash(p + float3(1,1,1)), f.x), f.y), f.z);
+}
+
+// Fractal Brownian Motion for natural cloud-like patterns
+float fbm(float3 p, int octaves)
+{
+    float value = 0.0;
+    float amplitude = 0.5;
+    float frequency = 1.0;
+    
+    for (int i = 0; i < octaves; i++)
+    {
+        value += amplitude * noise(p * frequency);
+        frequency *= 2.0;
+        amplitude *= 0.5;
+    }
+    return value;
+}
+
 // Initialize velocity field to a constant vector
 [numthreads(8,8,8)]
 void InitVelocityKernel(uint3 id : SV_DispatchThreadID)
@@ -70,8 +108,18 @@ void InjectKernel(uint3 id : SV_DispatchThreadID)
     if (d < injectRadius)
     {
         float falloff = 1 - (d / injectRadius);
+        
+        // Add noise for organic cloud shapes
+        float3 noisePos = p * 0.05; // Scale for noise
+        float cloudNoise = fbm(noisePos, 3);
+        cloudNoise = cloudNoise * 2.0 - 1.0; // Remap to -1 to 1
+        
+        // Combine sphere falloff with noise
+        float finalDensity = injectValue * falloff * (0.7 + 0.3 * cloudNoise);
+        finalDensity = max(0.0, finalDensity);
+        
         float prev = densityWrite[id];
-        densityWrite[id] = max(prev, injectValue * falloff);
+        densityWrite[id] = max(prev, finalDensity);
     }
 }
 
