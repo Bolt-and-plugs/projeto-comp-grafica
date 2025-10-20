@@ -91,6 +91,48 @@ float fbm(float3 p, int octaves)
     return value;
 }
 
+// Hash 3D to 3D for Worley noise feature points
+float3 hash3to3(float3 p)
+{
+    p = float3(dot(p, float3(127.1, 311.7, 74.7)),
+               dot(p, float3(269.5, 183.3, 246.1)),
+               dot(p, float3(113.5, 271.9, 124.6)));
+    return frac(sin(p) * 43758.5453123);
+}
+
+// Worley noise (cellular) for realistic cloud puff structure
+float worley(float3 p)
+{
+    float3 cell = floor(p);
+    float3 f = frac(p);
+    float minDist = 1.0;
+
+    // Consider 27 neighbouring cells for feature points
+    for (int z = -1; z <= 1; z++)
+    for (int y = -1; y <= 1; y++)
+    for (int x = -1; x <= 1; x++)
+    {
+        float3 neighbour = float3(x, y, z);
+        float3 featurePoint = hash3to3(cell + neighbour);
+        float3 offset = neighbour + featurePoint - f;
+        float dist = length(offset);
+        minDist = min(minDist, dist);
+    }
+
+    return minDist;
+}
+
+// Combined FBM + Worley pattern for organic clouds
+float cloudDensityPattern(float3 p)
+{
+    float baseFBM = fbm(p * 0.05, 3);
+    float worleyPattern = 1.0 - worley(p * 0.1);
+    float detail = fbm(p * 0.2, 2) * 0.5;
+
+    float density = baseFBM * worleyPattern + detail * 0.3;
+    return saturate(density);
+}
+
 // Initialize velocity field to a constant vector
 [numthreads(8,8,8)]
 void InitVelocityKernel(uint3 id : SV_DispatchThreadID)
@@ -113,13 +155,14 @@ void InjectKernel(uint3 id : SV_DispatchThreadID)
     {
         float falloff = 1 - (d / injectRadius);
         
-        // Add noise for organic cloud shapes
-        float3 noisePos = p * 0.05; // Scale for noise
-        float cloudNoise = fbm(noisePos, 3);
-        cloudNoise = cloudNoise * 2.0 - 1.0; // Remap to -1 to 1
-        
-        // Combine sphere falloff with noise
-        float finalDensity = injectValue * falloff * (0.7 + 0.3 * cloudNoise);
+        // Combine sphere falloff with Worley + FBM pattern
+    float3 noisePos = p * 0.05;
+    float cloudNoise = cloudDensityPattern(noisePos);
+
+    // Ensure strong core density while preserving cellular variation
+    float densityShape = 0.6 + 0.4 * cloudNoise;
+
+    float finalDensity = injectValue * falloff * densityShape;
         finalDensity = max(0.0, finalDensity);
         
         float prev = densityWrite[id];
