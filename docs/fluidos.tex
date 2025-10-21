@@ -2,22 +2,13 @@
 
 Os maiores desafios da simulação de fluidos está nos aspectos fisicos que se aplicam, como por exemplo, convecção, difusão, turbulência e tensão superficial \cite{desbrun1996}. No entanto, essas simulações eram (ao menos em 2003) quase inviáveis para serem empregadas em tempo real, portanto a precisão acaba sendo deixada parcialmente de lado nestas simulações.
 
-A simulação de fluidos começou, basicamente, com a equação de de Navier-Stokes que descrevem a dinamica dos fluidos (não vamos nos aprofundar, mas para efeito de curiosidade, esse sistema de equações diferenciais se baseia em derivadas parciais e permitem determinar os campos de velocidade e de pressão num escoamento de fluidos). Sua forma geral é dada por:
+A simulação de fluidos começou, basicamente, com a equação de de Navier-Stokes (que será abordada na seção \ref{sec:volumes}) que descrevem a dinamica dos fluidos (esse sistema de equações diferenciais se baseia em derivadas parciais e permitem determinar os campos de velocidade e de pressão num escoamento de fluidos). 
 
-
-$$
-\rho \frac{D\mathbf{v}}{Dt} = -\nabla p + \mu \nabla^2 \mathbf{v} + \rho \mathbf{f}
-$$
-
-\subsection{Fundamentação}
-
-Uma explicação simples: a equação de Navier-Stokes descreve como o movimento de um fluido é influenciado pela pressão, viscosidade e forças externas. Nela, $\rho$ é a densidade do fluido, $\mathbf{v}$ é o vetor velocidade, $p$ é a pressão, $\mu$ é o coeficiente de viscosidade, e $\mathbf{f}$ representa forças externas (como gravidade). Ela permite calcular como o fluido se move e se comporta em diferentes situações. Essa equação pode ser vista como um vetor de forças que atuam sobre o fluido, sendo representado como vetores de velocidades no espaço.
-
-\href{https://pt.wikipedia.org/wiki/Equa\%C3\%A7\%C3\%B5es\_de\_Navier-Stokes}{Para quem quiser se aprofundar}.
+\subsection{Smoothed Particle Hydrodynamics}
 
 Em 1983, T. Reeves \cite{reeves1983} introduziu sistemas de partículas como uma técnica para modelar uma classe de objetos difusos. Desde então, tanto a abordagem Lagrangiana baseada em partículas quanto a abordagem Euleriana baseada em grades têm sido usadas para simular fluidos em computação gráfica. Desbrun e Cani \cite{desbrun1996} e Tonnesen \cite{tonnesen1998} utilizam partículas para animar objetos macios. As partículas também foram usadas para animar superfícies \cite{witkin1991}, controlar superfícies implícitas \cite{bloomenthal1997} e animar fluxos de lava \cite{carlson2002}. Nos últimos anos, a abordagem Euleriana tem sido mais popular para a simulação de fluidos em geral \cite{fedkiw2001}, água \cite{stam1999, foster1996, enright2002}, objetos macios \cite{muller2002} e efeitos de derretimento \cite{carlson2002}.
 
-O artigo de Müller et al. (2003) \cite{muller2003} apresenta uma abordagem eficiente para simulação de fluidos baseada em Smoothed Particle Hydrodynamics (SPH). O método SPH representa o fluido como um conjunto de partículas, onde cada partícula carrega propriedades como massa, posição, velocidade e densidade. As interações entre partículas são calculadas usando funções de suavização (kernels), permitindo simular efeitos como pressão, viscosidade e forças externas.
+Em consonância, o artigo de Müller et al. (2003) \cite{muller2003} apresenta uma abordagem eficiente para simulação de fluidos baseada em Smoothed Particle Hydrodynamics (SPH). O método SPH representa o fluido como um conjunto de partículas, onde cada partícula carrega propriedades como massa, posição, velocidade e densidade. As interações entre partículas são calculadas usando funções de suavização (kernels), permitindo simular efeitos como pressão, viscosidade e forças externas.
 
 As principais fórmulas utilizadas no SPH são:
 
@@ -36,6 +27,4 @@ onde $p_i$ e $p_j$ são as pressões das partículas $i$ e $j$.
 \mathbf{f}_i^{\text{visc}} = \mu \sum_j m_j \frac{\mathbf{v}_j - \mathbf{v}_i}{\rho_j} \nabla^2 W(|\mathbf{r}_i - \mathbf{r}_j|, h) $$ onde $\mu$ é o coeficiente de viscosidade e $\mathbf{v}_i$, $\mathbf{v}_j$ são as velocidades das partículas.
 \end{itemize}
 
-Essas fórmulas permitem calcular as forças que atuam sobre cada partícula, resultando em simulações de líquidos realistas e eficientes para aplicações interativas. Há de se notar, entretanto, que essas fórmulas tendem a ser muito custosas se implementadas conforme a descrição, sem otimização linear inclusa. 
-
-Logo, diversos papers foram publicados visando manter a qualidade o suciente, mas reduzindo o custo computacional e permitir que se faça essa simulação em tempo real. 
+Essas fórmulas permitem calcular as forças que atuam sobre cada partícula, resultando em simulações de líquidos realistas e eficientes para aplicações interativas. Há de se notar, entretanto, que essas fórmulas tendem a ser muito custosas se implementadas conforme a descrição, sem otimização linear inclusa. Logo, diversos papers foram publicados visando manter qualidade suficiente, mas reduzindo o custo computacional e permitindo que essa simulação seja feita em tempo real. 

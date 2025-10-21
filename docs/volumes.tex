@@ -1,9 +1,9 @@
-\section{Volumes (baseado em densidade)}
+\subsection{Nuvens Volumétricas}
 \label{sec:volumes}
 
-Volumes em geral podem ser descritos de diversas maneiras, dentre elas, campos de particulas, campos de voxels, SDFs, entre outros. No entanto, ao simular um fluído em tempo real, temos o desafio de manter a performance sem perder muita qualidade visual. Para isso, técnicas de simulação baseadas em grids (grades) são frequentemente utilizadas, onde o espaço é dividido em células (voxels) e propriedades do fluído, como densidade, velocidade e pressão, são armazenadas em cada célula. Essas propriedades são então atualizadas ao longo do tempo usando métodos numéricos para resolver as equações de Navier-Stokes, que governam o comportamento dos fluidos. Os volumes serão abordados aqui de 2 formas, modelagem de forma e shading, de maneira a se melhor representar volumes como fumaça, fogo, agua, poeira, folhas, etc.
+Volumes em geral podem ser descritos de diversas maneiras, dentre elas, campos de particulas, campos de voxels, SDFs, entre outros. No entanto, ao simular um fluído em tempo real, temos o desafio de manter a performance sem perder muita qualidade visual. Para isso, técnicas de simulação baseadas em grids (grades) são frequentemente utilizadas, onde o espaço é dividido em células (voxels) e propriedades do fluído, como densidade, velocidade e pressão, são armazenadas em cada célula. Essas propriedades são então atualizadas ao longo do tempo usando métodos numéricos que resolvem as equações de Navier-Stokes, que governam o comportamento dos fluidos. Os volumes serão abordados aqui de 2 formas, modelagem de forma e shading, de maneira a se melhor representar volumes como fumaça, fogo, agua, poeira, folhas, etc.
 
-\subsection{Modelagem de forma}
+\subsubsection{Modelagem de forma}
 No geral, ao se computar campos de particulas, espera-se que todas elas tenham seu tempo de vida bem definido para que se possa modelar de maneira precisa o seu comportamento. No entanto, em tempo real, esse trabalho se torna muito custoso, especialmente para volumes que representam fluidos como fumaca, folhas ou ate mesmo agua. O movimento desses elementos passa a ser calculado, entao, convertendo as velocidades que circulam o objeto em forcas de corpo. 
 
 A poeira, por exemplo, pode ser modelada sendo carregada pelo vetor de velocidades, sem qualquer resistência significativa ou força externa. Entretanto, no caso da fumaça ou das nuvens, as particulas são substituidas pela simulação da densidade do fluido, que aproxima a quantidade de particulas presentes (normalmente um valor entre 0 e 1). Essa descrição é dada por essa função (conhecida como equação escalar de advecção-difusão): 
@@ -28,7 +28,7 @@ A equação de advecção-difusão pode ser resolvida numericamente usando méto
 
 Esse cálculo normalmente é atribuido a um \textit{grid} bidimensional ou tridimensional, onde cada célula da grade armazena informações sobre a densidade do fluido, velocidade e outras propriedades relevantes. A resolução da grade afeta diretamente a precisão e o custo computacional da simulação. Grades mais finas proporcionam maior detalhe, mas exigem mais memória e poder de processamento.
 
-\subsubsection{Passo de Densidade}
+\subsubsection*{Passo de Densidade}
 O método linear proposto por Stam at al \cite{Stam2003} inicia-se com algum estado para a velocidade e densidade e, então, atualiza seus valores baseado em eventos externos (forças, fonte de energia, fontes de particulas e etc.). Esse método se tornou famoso por ser estável para grandes passos de tempo (estabilidade incondicional) \footnote{Isso significa que, para qualquer valor positivo do passo de tempo, o método não produzirá resultados divergentes ou instáveis.}, o que é uma grande vantagem para simulações em tempo real. A cada passo de tempo, o método segue três etapas principais, passando pela equação de advecção-difusão de maneira "inversa", começando do termo final e indo para o inicial:
 
 \begin{itemize}
@@ -64,7 +64,7 @@ float *u, float *v, float diff, float dt) {
 \end{lstlisting}
 
 
-\subsubsection{Passo de Velocidade}
+\subsubsection*{Passo de Velocidade}
 O passo de velocidade é similar ao passo de densidade, mas com algumas diferenças importantes. Podemos dizer que a velocidade do campo se altera de 3 maneiras distintas: forças externas, difusão e advecção própria (ou auto-advecção - no qual o campo move a si mesmo). De maneira geral, pode ser descrito pela seguinte equação:
 
 $$\frac{\partial u}{\partial t} = - (u \cdot \nabla) u + \nu \nabla^2 u + f - \frac{1}{\rho} \nabla p$$
@@ -96,7 +96,7 @@ float *u0, float *v0, float visc, float dt) {
 }
 \end{lstlisting}
 
-Note que temos um novo procedimento neste passo chamado \texttt{project}, que é responsável por garantir que o campo de velocidades seja incompressível, ou seja, que a divergência do campo seja zero ($\nabla \cdot u = 0$) \footnote{Conversação da massa:  a massa do fluido permanece constante ao longo do tempo.}. Isso é importante para simular fluidos realistas, onde a massa é conservada. Este método pode ser implementado resolvendo a equação de Poisson para a pressão e, em seguida, ajustando o campo de velocidades com base no gradiente da pressão.
+Note que temos um novo procedimento neste passo chamado \texttt{project}, que é responsável por garantir que o campo de velocidades seja incompressível, ou seja, que a divergência do campo seja zero ($\nabla \cdot u = 0$) \footnote{Conservação da massa: a massa do fluido permanece constante ao longo do tempo.}. Isso é importante para simular fluidos realistas, onde a massa é conservada. Este método pode ser implementado resolvendo a equação de Poisson para a pressão e, em seguida, ajustando o campo de velocidades com base no gradiente da pressão.
 
 
 O procedimento \texttt{project} calcula a pressão p que seria necessária para "empurrar" o excesso de massa para fora (ou puxar a falta de massa para dentro) e, em seguida, aplica a força de pressão ($-\nabla p$) para corrigir as velocidades e pode ser implementado da seguinte maneira:
@@ -134,7 +134,7 @@ void project(int N, float *u, float *v, float *p, float *div) {
 }
 \end{lstlisting}
 
-\subsection{Conclusão da modelagem de forma}
+\subsubsection{Conclusão da modelagem de forma}
 Podemos concluir essa seção com esse código maravilhoso que aglomera tudo o que foi visto até o momento:
 
 \begin{lstlisting}[language=C]
@@ -147,9 +147,9 @@ float *dens, float *dens0, float diff, float visc, float dt) {
 }
 \end{lstlisting}
 
-a rotina \texttt{draw\_dens} será abordada na seção de shading.
+a rotina \texttt{draw\_dens} será abordada na seção de shading \ref{sec:shading}.
 
-\subsection{Shading}
+\section{Shading}
 \label{sec:shading}
 
 Volumes são tradicionalmente renderizados usando técnicas de ray marching, onde um raio é lançado através do volume e amostras são coletadas ao longo do caminho do raio. Essas amostras são então usadas para calcular a cor e a opacidade do pixel correspondente na imagem final. A equação de rendering para volumes pode ser expressa como:
@@ -171,7 +171,7 @@ Onde:
 
 Vamos tratar dos fenomenos fisicos descritos pela equação acima a seguir, passando por absorção, emissão e espalhamento e como eles podem ser implementados em um sistema de ray marching.
 
-\subsubsection{Interação da luz com volumes}
+\subsection{Interação da luz com volumes}
 
 A luz pode ser absorvida, emitida ou espalhada ao interagir com os volumes gerados até aqui, sendo cada um dos fenômenos descritos por uma equação específica:
 
@@ -197,7 +197,7 @@ A luz pode ser absorvida, emitida ou espalhada ao interagir com os volumes gerad
 
 Todas essas técnicas se acumulam na equação de rendering volumétrico expressa no inicio da seção \ref{sec:shading}, que pode ser resolvida numericamente usando métodos como ray marching ou path tracing. A implementação dessas técnicas pode variar dependendo do contexto específico e dos requisitos de desempenho e qualidade visual, mas o objetivo geral é capturar a complexidade da interação da luz com volumes de maneira eficiente e realista.
 
-\subsubsection{Implementação básica de ray marching}
+\subsection{Implementação básica de ray marching}
 A implementação básica de ray marching envolve o lançamento de um raio através do volume e a amostragem da densidade e outras propriedades do volume ao longo do caminho do raio. O código a seguir ilustra uma implementação simples de ray marching para volumes:
 
 \begin{lstlisting}[language=C]
