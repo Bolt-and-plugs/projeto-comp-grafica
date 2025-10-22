@@ -149,7 +149,7 @@ float *dens, float *dens0, float diff, float visc, float dt) {
 
 a rotina \texttt{draw\_dens} será abordada na seção de shading \ref{sec:shading}.
 
-\section{Shading}
+\subsection{Shading}
 \label{sec:shading}
 
 Volumes são tradicionalmente renderizados usando técnicas de ray marching, onde um raio é lançado através do volume e amostras são coletadas ao longo do caminho do raio. Essas amostras são então usadas para calcular a cor e a opacidade do pixel correspondente na imagem final. A equação de rendering para volumes pode ser expressa como:
@@ -171,7 +171,7 @@ Onde:
 
 Vamos tratar dos fenomenos fisicos descritos pela equação acima a seguir, passando por absorção, emissão e espalhamento e como eles podem ser implementados em um sistema de ray marching.
 
-\subsection{Interação da luz com volumes}
+\subsubsection{Interação da luz com volumes}
 
 A luz pode ser absorvida, emitida ou espalhada ao interagir com os volumes gerados até aqui, sendo cada um dos fenômenos descritos por uma equação específica:
 
@@ -197,7 +197,7 @@ A luz pode ser absorvida, emitida ou espalhada ao interagir com os volumes gerad
 
 Todas essas técnicas se acumulam na equação de rendering volumétrico expressa no inicio da seção \ref{sec:shading}, que pode ser resolvida numericamente usando métodos como ray marching ou path tracing. A implementação dessas técnicas pode variar dependendo do contexto específico e dos requisitos de desempenho e qualidade visual, mas o objetivo geral é capturar a complexidade da interação da luz com volumes de maneira eficiente e realista.
 
-\subsection{Implementação básica de ray marching}
+\subsubsection{Implementação básica de ray marching}
 A implementação básica de ray marching envolve o lançamento de um raio através do volume e a amostragem da densidade e outras propriedades do volume ao longo do caminho do raio. O código a seguir ilustra uma implementação simples de ray marching para volumes:
 
 \begin{lstlisting}[language=C]
