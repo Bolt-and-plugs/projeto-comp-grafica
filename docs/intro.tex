@@ -1,14 +1,42 @@
 \section{Introdução}
-Em 1952 o computador MANIAC (Mathematical Analyzer, Numerical Integrator, and Computer) ou IAS foi construindo, prometendo resolver problemas matemáticos antes tidos como ou muito difíceis, ou muito demandantes de processamento humano. Em geral, podemos associar os seguintes problemas que rodavam no IAS (citados por Dyson em Turing’s Cathedral: The Origins of the Digital Universe \cite{dyson2012turing}) ao objeto de estudo do nosso projeto, a física:
+
+Em 1952, foi construído o computador MANIAC (Mathematical Analyzer, Numerical Integrator, and Computer), também conhecido como IAS. Sua criação marcou uma nova era ao prometer resolver problemas matemáticos até então considerados complexos demais ou que exigiam esforço humano excessivo. Entre os desafios abordados por esse sistema, mencionados por Dyson em \textit{Turing’s Cathedral: The Origins of the Digital Universe} \cite{dyson2012turing}, destacavam-se questões diretamente ligadas à física:
 
 \begin{enumerate}
-\item Explosões nucleares, medidas em microsegundos
-\item Ondas de choque, que variavam em tempo de microsegundos a minutos
-\item Metereologia
-\item Evolução biológia 
-\item Evolução estelar
+    \item Explosões nucleares, analisadas em microsegundos;
+    \item Ondas de choque, com variação temporal de microsegundos a minutos;
+    \item Meteorologia;
+    \item Evolução biológica;
+    \item Evolução estelar.
 \end{enumerate}
 
-Para explicitar esses avanços e, em especial, explorar a computação gráfica aplicada na física sobre o tempo, escolheu-se trabalhar com o tema de simulação de ambientes, unindo temáticas como sistemas de partículas, fluidos e terrenos. Estes tópicos, apesar de a priori parecem desconexos e um pouco restritivos quanto ao tema, são extremamente relevantes para a computação gráfica, e são amplamente utilizados em jogos, filmes e outras mídias visuais, além de terem fomentado a base para todas as simulações e aplicações físicas futuras.  
+A partir desses avanços e, especialmente, buscando compreender o papel da física na computação gráfica ao longo do tempo, este trabalho tem como foco o estudo das técnicas de simulação de ambientes, abrangendo sistemas de partículas, fluidos e terrenos. Embora esses temas possam parecer inicialmente restritos, são fundamentais para a criação de mundos virtuais realistas e constituem a base física de praticamente todas as aplicações modernas em gráficos computacionais, desde jogos e filmes até ferramentas de visualização e modelagem científica. Faz-se ainda uma menção especial aos corpos rígidos e tecidos, igualmente relevantes, mas que extrapolam os limites temporais e conceituais definidos neste estudo.
 
-Faz-se uma menção honrosa aos corpos rígidos e tecidos, que também são temas extremamente relevantes e interessantes, mas que por limitações de tempo e escopo do projeto, não puderam ser abordados.
+A trajetória histórica da computação gráfica evidencia uma relação direta entre os avanços tecnológicos e o aprimoramento dos modelos físicos que lhes dão suporte. Desde a década de 1960, o campo vem sendo moldado por esforços de traduzir fenômenos ópticos e mecânicos para o domínio digital, permitindo que luz, matéria e movimento fossem descritos matematicamente.
+
+\subsection{Primeiros avanços na renderização e modelagem}
+
+Na década de 1960, Arthur Appel apresentou o algoritmo de \textit{ray tracing} (1963), introduzindo o conceito de traçar raios de luz em um espaço tridimensional para simular sombras e reflexos, um marco que inaugurou uma abordagem física da propagação luminosa. Poucos anos depois, surgiram técnicas como o \textit{Gouraud Shading} (1971) e o \textit{Phong Shading} (1973), que elevaram o realismo visual ao representar de forma mais precisa a iluminação difusa e especular em superfícies curvas.
+
+Em 1974, Edwin Catmull publicou o algoritmo de \textit{rasterização}, estabelecendo as bases para a renderização em tempo real e para o desenvolvimento posterior das GPUs. Complementarmente, a introdução dos fractais por Benoît Mandelbrot (1975) ampliou o horizonte da modelagem geométrica, possibilitando a criação de paisagens e estruturas naturais por meio de funções matemáticas iterativas.
+
+Durante a década de 1980, pesquisas realizadas na Universidade de Cornell consolidaram os fundamentos da renderização fisicamente precisa, com ênfase em modelos de transporte de luz e iluminação global. Em 1984, o modelo de reflexão de Cook–Torrance unificou conceitos de óptica física e microgeometria superficial, dando origem ao que hoje se conhece como \textit{Physically Based Rendering} (PBR), uma formulação que permanece central na representação realista de superfícies metálicas, rugosas e dielétricas.
+
+Nos anos 1990, o aumento do poder computacional intensificou a integração entre física e gráficos. Em 1996, o sistema \textit{NVIDIA PhysX} trouxe a simulação de corpos rígidos e fluidos para ambientes tridimensionais interativos, representando um marco na aplicação direta das leis de Newton em tempo real.
+
+A década de 2000 testemunhou a ascensão da computação paralela em larga escala. O lançamento do \textit{CUDA} (2007), pela NVIDIA, possibilitou o uso das GPUs como processadores de propósito geral (\textit{GPGPU}), acelerando significativamente as simulações físicas e os algoritmos de renderização. Em 2009, o PBR foi incorporado a motores gráficos comerciais, como o \textit{Unreal Engine} e o \textit{Unity}, consolidando o uso de modelos físicos de iluminação em jogos e filmes.
+
+\subsection{Avanços em tempo real e aprendizado de máquina}
+
+Entre 2010 e 2015, o aumento da capacidade das GPUs e a evolução dos motores de física, como o \textit{Unreal Chaos} e o \textit{Unity DOTS}, tornaram viável a simulação de fluidos em tempo real. A partir de 2016, técnicas de aprendizado de máquina começaram a ser aplicadas ao \textit{denoising} em \textit{ray tracing}, com destaque para o \textit{NVIDIA OptiX}, que reduziu o ruído das imagens renderizadas usando modelos neurais.
+
+Em 2018, os \textit{Neural Radiance Fields} (NeRF) revolucionaram o campo ao permitir a reconstrução tridimensional de cenas a partir de imagens bidimensionais, inaugurando a era da renderização neural. De 2019 a 2021, consolidou-se o conceito de \textit{Neural Rendering}, que combina aprendizado profundo com modelos físicos de transporte de luz. Surgiram métodos híbridos que uniam \textit{path tracing} e redes neurais para acelerar a convergência da renderização fisicamente baseada, além de simulações físicas aprendidas, como fluidos, tecidos e corpos deformáveis,	 em tempo real.
+
+Em 2022, o \textit{Real-Time Path Tracing} tornou-se viável com os avanços das GPUs RTX série 40 e o aprimoramento das técnicas de \textit{denoising neural}. O ano de 2023 marcou outro salto com o \textit{Neuralangelo}, da NVIDIA, que permitiu reconstruções tridimensionais de alta fidelidade a partir de imagens 2D. Representações mais eficientes, como o \textit{MERF} e o método \textit{Adaptive Shells}, reduziram ainda mais o custo computacional da renderização neural.
+
+Entre 2024 e 2025, observa-se a consolidação das técnicas de \textit{Neural Rendering} e \textit{Neural Shading} em pipelines gráficos padronizados, integradas a APIs como \textit{DirectX} e \textit{Vulkan}. O surgimento do \textit{RTX Neural Radiance Cache} permitiu modelar iluminação indireta com aprendizado profundo. Paralelamente, o uso de redes neurais informadas por leis físicas (\textit{Physics-Informed Neural Networks}, PINNs) vem viabilizando simulações de fluidos e tecidos com precisão e velocidade sem precedentes.
+
+\subsection{Conclusão}
+
+Do traçado de raios proposto por Appel às renderizações neurais contemporâneas, a história da computação gráfica revela uma convergência cada vez mais próxima entre modelos físicos e técnicas computacionais. Essa interação simbiótica não apenas eleva o realismo visual, mas também redefine o papel da física como base conceitual e estrutural na criação digital de mundos virtuais.
+
