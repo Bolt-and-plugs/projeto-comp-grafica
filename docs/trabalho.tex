@@ -2,8 +2,6 @@
 
 % Pacotes para o português.
 \usepackage[brazilian,provide=*]{babel}
-\usepackage[utf8]{inputenc}
-\usepackage[T1]{fontenc}
 \usepackage{graphicx}
 \usepackage{listings}
 \usepackage{xcolor}
@@ -19,7 +17,6 @@
 \usepackage{setspace}
 \usepackage{breakcites}
 \usepackage{float}
-\usepackage{times}
 \usepackage{lipsum}
 \usepackage{booktabs}
 \usepackage{fancyhdr}
@@ -28,6 +25,7 @@
 \usepackage{amssymb}
 \usepackage{listings}
 \usepackage{xcolor}
+
 \definecolor{codegreen}{rgb}{0,0.6,0}
 \definecolor{codegray}{rgb}{0.5,0.5,0.5}
 \definecolor{codepurple}{rgb}{0.58,0,0.82}
@@ -52,8 +50,7 @@
 }
 \lstset{style=mystyle}
 
-
-
+\usepackage{times}
 \usepackage{tikz}
 \usetikzlibrary{shapes.multipart, arrows.meta, positioning, fit}
 
@@ -75,11 +72,18 @@
 
 \begin{titlepage}
 	\begin{center}
-	
-	\vspace{115pt}
-    \textbf{\Huge{Projeto Comp. Gráfica}}\\
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{img/LogoUnesp.png}
+\end{figure}
+
+	\vspace{5cm}
+    \textbf{\Huge{Survey sobre computação gráfica na física}} \\
+    \vspace{5pt}
+    Um estudo de caso sobre a história e uma aplicação prática.
         
-	\vspace{115pt}
+	\vspace{5cm}
     Carlos Eduardo Nogueira Silva \\
     Felipe Gomes da Silva \\
     Gabriel Martins Brum \\
@@ -89,19 +93,22 @@
 	\vspace{1cm}
 	\begin{center}
 		\vspace{\fill}
+    \large{São José do Rio Preto \- SP}\\
     \large{Setembro, 2025} 
 	\end{center}
 \end{titlepage}
 
 % Table of contents
 \tableofcontents
+
+\newpage
+\input{abstract.tex}
 \newpage
 
 \input{intro.tex}
 \input{sistema-de-particulas.tex}
 \input{terrenos.tex}
 \input{fluidos.tex}
-\input{volumes.tex}
 \input{objetivos.tex}
 \input{metodologia.tex}
 \input{resultados.tex}
