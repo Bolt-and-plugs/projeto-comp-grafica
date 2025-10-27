@@ -1,0 +1,48 @@
+\begin{tikzpicture}[
+    node distance=10mm and 18mm,  % Distância horizontal aumentada
+    box/.style = {draw, rounded corners, minimum width=40mm, minimum height=10mm, align=center, font=\footnotesize, fill=blue!5},
+    cloudstyle/.style = {draw, cloud, cloud puffs=12, cloud ignores aspect, minimum width=36mm, minimum height=18mm, align=center, font=\footnotesize, fill=gray!10},
+    small/.style = {draw, rounded corners, minimum height=6mm, align=center, font=\scriptsize, fill=white},
+    arr/.style = {->, >=Stealth, line width=0.7pt},
+    faded/.style = {draw=black!50, text=black!70, fill=white, rounded corners, font=\scriptsize}
+]
+
+% --- Pipeline Principal ---
+\node (cpu) [small] {CPU / Unity Engine};
+
+\node (sim) [box, below=of cpu, node distance=14mm]
+    {Etapa 1: Simulação de Fluidos \\ (Compute Shader)};
+
+\node (data) [box, below=of sim, node distance=25mm, fill=green!10]
+    {Grid 3D (Textura Volumétrica)};
+
+\node (render) [box, below=of data, node distance=25mm]
+    {Etapa 2: Renderização \\ (Volumetric Ray Marching)};
+
+\node (output) [cloudstyle, below=of render, node distance=25mm]
+    {Imagem Final (Nuvem Volumétrica)};
+
+% --- Passos da Simulação) ---
+\node (step_title) [font=\tiny\bfseries, left=of sim, node distance=45mm] {Passos da Simulação:};
+\node (step1) [faded, below=of step_title, node distance=6mm] {Adição de Fontes};
+\node (step2) [faded, below=of step1] {Difusão};
+\node (step3) [faded, below=of step2] {Advecção (Semi-Lagrangiana)};
+
+% Fluxo Principal
+\draw [arr] (cpu) -- (sim)
+    node [midway, right, font=\tiny, xshift=2mm] {Dispatch (GPU)};
+\draw [arr, line width=1pt] (sim) -- (data)
+    node [midway, right, font=\scriptsize, xshift=1mm] {Atualiza Grid (Write)};
+\draw [arr, line width=1pt] (data) -- (render)
+    node [midway, right, font=\scriptsize, xshift=1mm] {Amostra Grid (Read)};
+\draw [arr] (render) -- (output);
+
+\draw [arr, line width=1pt, dashed] (data.east) to [bend right=50] (sim.east)
+    node [midway, right, font=\scriptsize, xshift=1mm] {};
+
+\coordinate (sim_input) at (sim.west);
+\draw [arr, dashed, faded] (step1.east) -- (sim_input);
+\draw [arr, dashed, faded] (step2.east) -- (sim_input);
+\draw [arr, dashed, faded] (step3.east) -- (sim_input);
+
+\end{tikzpicture}

@@ -175,15 +175,15 @@ MonoBehaviour:
   injectRadius: 24.8
   injectValue: 5.01
   addConstantSource: 1
-  sourceScale: 3.32
+  sourceScale: 2.68
   smartSourceInjection: 1
-  sourceCycleTime: 20
-  cloudCount: 100
-  cloudRadius: 10
-  useLayeredClouds: 1
+  sourceCycleTime: 19.1
+  cloudCount: 69
+  cloudRadius: 18.7
+  useLayeredClouds: 0
   rayMarchMaterial: {fileID: 2100000, guid: b298d5f94c0bc1f438d66f252e84378f, type: 2}
   volumeRenderer: {fileID: 56427394}
-  rayMarchSteps: 66
+  rayMarchSteps: 82
   cloudColor: {r: 1, g: 1, b: 1, a: 1}
   darkCloudColor: {r: 0.6698113, g: 0.6698113, b: 0.6698113, a: 1}
   absorption: 0.318

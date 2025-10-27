@@ -48,7 +48,7 @@ public class FluidController : MonoBehaviour
     private float sourceTimer = 0f;
     
     [Tooltip("Number of cloud spheres to generate")]
-    [Range(1, 100)]
+    [Range(1, 500)]
     public int cloudCount = 99;
     
     [Tooltip("Radius of each cloud sphere")]
