@@ -24,6 +24,14 @@ public class FluidController : MonoBehaviour
     [Range(0f, 5f)]
     public float decayRate = 0.5f;
 
+    [Header("Pressure Projection")]
+    public bool projectVelocity = true;
+    [Tooltip("Jacobi iterations for pressure solve (divergence-free enforcement).")]
+    [Range(0, 100)]
+    public int pressureIterations = 30;
+    [Tooltip("Grid cell size used for divergence/gradient (world units).")]
+    public float cellSize = 1f;
+
     [Header("Velocity Init / Sources")]
     public Vector3 initialVelocity = new Vector3(0, 0.25f, 0);
     
@@ -73,6 +81,8 @@ public class FluidController : MonoBehaviour
     // Internal RenderTextures
     private RenderTexture densityA, densityB;
     private RenderTexture velocity;
+    private RenderTexture pressureA, pressureB;
+    private RenderTexture divergence;
 
     // Optional source density texture
     private RenderTexture densitySource;
@@ -84,6 +94,9 @@ public class FluidController : MonoBehaviour
     private int kAdvect = -1;
     private int kDiffuse = -1;
     private int kLifecycle = -1;
+    private int kDivergence = -1;
+    private int kPressureJacobi = -1;
+    private int kSubtractGradient = -1;
 
     // Cached bounds
     private Vector3 boundsMin;
@@ -103,7 +116,10 @@ public class FluidController : MonoBehaviour
 
         Allocate3DTexture(ref densityA, RenderTextureFormat.RFloat);
         Allocate3DTexture(ref densityB, RenderTextureFormat.RFloat);
-        Allocate3DTexture(ref velocity, RenderTextureFormat.ARGBFloat);
+    Allocate3DTexture(ref velocity, RenderTextureFormat.ARGBFloat);
+    Allocate3DTexture(ref pressureA, RenderTextureFormat.RFloat);
+    Allocate3DTexture(ref pressureB, RenderTextureFormat.RFloat);
+    Allocate3DTexture(ref divergence, RenderTextureFormat.RFloat);
 
         FindKernels();
 
@@ -119,6 +135,10 @@ public class FluidController : MonoBehaviour
         if (addConstantSource && kAddSource >= 0)
         {
             CreateSourceTexture();
+            if (densitySource)
+            {
+                Graphics.CopyTexture(densitySource, densityA);
+            }
         }
 
         UpdateBoundsFromTransform();
@@ -140,6 +160,21 @@ public class FluidController : MonoBehaviour
         // Set global simulation params
         computeShader.SetVector("gridSize", new Vector4(gridSize.x, gridSize.y, gridSize.z, 0));
         computeShader.SetFloat("deltaTime", dt);
+    float safeCellSize = Mathf.Max(1e-4f, cellSize);
+    computeShader.SetFloat("cellSize", safeCellSize);
+
+        // Velocity forces / initialization
+        if (uniformVelocity && kInitVelocity >= 0)
+        {
+            computeShader.SetVector("initialVelocity", initialVelocity);
+            computeShader.SetTexture(kInitVelocity, "velocityWrite", velocity);
+            DispatchFull(kInitVelocity);
+        }
+
+        if (projectVelocity)
+        {
+            ProjectVelocityField();
+        }
 
 
         //  source (add_source stage)
@@ -171,44 +206,10 @@ public class FluidController : MonoBehaviour
             DispatchFull(kAddSource);
         }
 
-        // real-time injection (space bar)
-        bool injectPressed =
-#if ENABLE_INPUT_SYSTEM
-            (Keyboard.current != null && Keyboard.current.spaceKey.isPressed);
-#else
-            Input.GetKey(KeyCode.Space);
-#endif
-        if (kInject >= 0 && injectPressed)
-        {
-            computeShader.SetVector("injectPos", new Vector3(gridSize.x * 0.5f, gridSize.y * 0.5f, gridSize.z * 0.5f));
-            computeShader.SetFloat("injectRadius", injectRadius);
-            computeShader.SetFloat("injectValue", injectValue);
-            computeShader.SetTexture(kInject, "densityWrite", densityA);
-            DispatchFull(kInject);
-        }
-
-        // 3. Advection: densityA -> densityB
-        if (kAdvect >= 0)
-        {
-            // Re-initialize velocity every frame if uniform velocity is enabled
-            if (uniformVelocity && kInitVelocity >= 0)
-            {
-                computeShader.SetVector("initialVelocity", initialVelocity);
-                computeShader.SetTexture(kInitVelocity, "velocityWrite", velocity);
-                DispatchFull(kInitVelocity);
-            }
-            
-            computeShader.SetTexture(kAdvect, "velocityRead", velocity);
-            computeShader.SetTexture(kAdvect, "densityRead", densityA);
-            computeShader.SetTexture(kAdvect, "densityWrite", densityB);
-            DispatchFull(kAdvect);
-            Swap(ref densityA, ref densityB);
-        }
-
-        // 4. Diffusion (Jacobi) on density
-        if (kDiffuse >= 0 && diffusionRate > 0)
-        {
-          float dx = 1.0f; // grid cell size
+        // 3. Diffusion (Jacobi) on density
+                if (kDiffuse >= 0 && diffusionRate > 0)
+                {
+                    float dx = safeCellSize;
           float alphaVal = (dx * dx) / (diffusionRate * dt);
           float rBetaVal = 1.0f / (6.0f + alphaVal);
 
@@ -223,6 +224,16 @@ public class FluidController : MonoBehaviour
                 DispatchFull(kDiffuse);
                 Swap(ref densityA, ref densityB);
             }
+        }
+        
+        // 4. Advection: densityA -> densityB
+        if (kAdvect >= 0)
+        {
+            computeShader.SetTexture(kAdvect, "velocityRead", velocity);
+            computeShader.SetTexture(kAdvect, "densityRead", densityA);
+            computeShader.SetTexture(kAdvect, "densityWrite", densityB);
+            DispatchFull(kAdvect);
+            Swap(ref densityA, ref densityB);
         }
         
         // 5. Lifecycle: decay density over time
@@ -253,6 +264,9 @@ public class FluidController : MonoBehaviour
         ReleaseRT(densityA);
         ReleaseRT(densityB);
         ReleaseRT(velocity);
+    ReleaseRT(pressureA);
+    ReleaseRT(pressureB);
+    ReleaseRT(divergence);
         ReleaseRT(densitySource);
     }
 
@@ -290,6 +304,9 @@ public class FluidController : MonoBehaviour
         kAdvect       = SafeFind("AdvectKernel");
         kDiffuse      = SafeFind("DiffuseKernel");
         kLifecycle    = SafeFind("LifecycleKernel");
+        kDivergence   = SafeFind("DivergenceKernel");
+        kPressureJacobi = SafeFind("PressureJacobiKernel");
+        kSubtractGradient = SafeFind("SubtractGradientKernel");
     }
 
     int SafeFind(string kernel)
@@ -409,6 +426,39 @@ public class FluidController : MonoBehaviour
     // ------------------------------------------------------
     // Utility
     // ------------------------------------------------------
+    void ProjectVelocityField()
+    {
+        if (kDivergence < 0 || kPressureJacobi < 0 || kSubtractGradient < 0)
+            return;
+
+        // Divergence computation (also clears pressureA)
+        computeShader.SetTexture(kDivergence, "velocityRead", velocity);
+        computeShader.SetTexture(kDivergence, "divergenceWrite", divergence);
+        computeShader.SetTexture(kDivergence, "pressureWrite", pressureA);
+        DispatchFull(kDivergence);
+
+        RenderTexture pressureReadTex = pressureA;
+        RenderTexture pressureWriteTex = pressureB;
+
+        int iterations = Mathf.Max(0, pressureIterations);
+        if (iterations > 0)
+        {
+            for (int i = 0; i < iterations; i++)
+            {
+                computeShader.SetTexture(kPressureJacobi, "pressureRead", pressureReadTex);
+                computeShader.SetTexture(kPressureJacobi, "pressureWrite", pressureWriteTex);
+                computeShader.SetTexture(kPressureJacobi, "divergenceRead", divergence);
+                DispatchFull(kPressureJacobi);
+                Swap(ref pressureReadTex, ref pressureWriteTex);
+            }
+        }
+
+        computeShader.SetTexture(kSubtractGradient, "pressureRead", pressureReadTex);
+        computeShader.SetTexture(kSubtractGradient, "velocityRead", velocity);
+        computeShader.SetTexture(kSubtractGradient, "velocityWrite", velocity);
+        DispatchFull(kSubtractGradient);
+    }
+
     void DispatchFull(int kernel)
     {
         if (kernel < 0) return;
