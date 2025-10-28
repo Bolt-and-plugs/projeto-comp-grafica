@@ -102,6 +102,11 @@ public class FluidController : MonoBehaviour
     private Vector3 boundsMin;
     private Vector3 boundsSize;
 
+    // Cached source settings to rebuild prebaked volume when changed at runtime
+    private int cachedCloudCount;
+    private float cachedCloudRadius;
+    private bool cachedUseLayeredClouds;
+
     // ------------------------------------------------------
     // Unity Lifecycle
     // ------------------------------------------------------
@@ -139,6 +144,7 @@ public class FluidController : MonoBehaviour
             {
                 Graphics.CopyTexture(densitySource, densityA);
             }
+            CacheSourceSettings();
         }
 
         UpdateBoundsFromTransform();
@@ -162,6 +168,8 @@ public class FluidController : MonoBehaviour
         computeShader.SetFloat("deltaTime", dt);
     float safeCellSize = Mathf.Max(1e-4f, cellSize);
     computeShader.SetFloat("cellSize", safeCellSize);
+
+    RebuildSourceTextureIfNeeded();
 
         // Velocity forces / initialization
         if (uniformVelocity && kInitVelocity >= 0)
@@ -342,9 +350,45 @@ public class FluidController : MonoBehaviour
         }
     }
 
+    void CacheSourceSettings()
+    {
+        cachedCloudCount = cloudCount;
+        cachedCloudRadius = cloudRadius;
+        cachedUseLayeredClouds = useLayeredClouds;
+    }
+
+    void RebuildSourceTextureIfNeeded()
+    {
+        if (!addConstantSource || kInject < 0)
+            return;
+
+        bool requiresRebuild = densitySource == null ||
+                               cloudCount != cachedCloudCount ||
+                               Mathf.Abs(cloudRadius - cachedCloudRadius) > Mathf.Epsilon ||
+                               useLayeredClouds != cachedUseLayeredClouds;
+
+        if (!requiresRebuild)
+            return;
+
+        CreateSourceTexture();
+
+        if (densitySource && densityA)
+        {
+            Graphics.CopyTexture(densitySource, densityA);
+        }
+
+        CacheSourceSettings();
+    }
+
     // One-time build of multiple cloud spheres using the InjectKernel
     void CreateSourceTexture()
     {
+        if (densitySource != null)
+        {
+            densitySource.Release();
+            densitySource = null;
+        }
+
         var desc = new RenderTextureDescriptor(gridSize.x, gridSize.y, RenderTextureFormat.RFloat, 0)
         {
             dimension = TextureDimension.Tex3D,
