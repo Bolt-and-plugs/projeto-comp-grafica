@@ -81,7 +81,7 @@ Temos como entrada na função o tamanho da matriz (N), a matriz de densidade at
 
 Percebe-se que, neste caso, temos 2 campos de velocidade (u e v), o que indica que estamos trabalhando em 2D. Para 3D, teríamos um terceiro campo de velocidade (w) e a função de advecção precisaria ser ajustada para levar isso em conta.
 
-O codigo no final se aproxima disso:
+O código no final se aproxima disso:
 \begin{lstlisting}[language=C]
 void dens_step(int N, float *x, float *x0, 
 float *u, float *v, float diff, float dt) {
@@ -124,7 +124,7 @@ float *u0, float *v0, float visc, float dt) {
 }
 \end{lstlisting}
 
-Note que temos um novo procedimento neste passo chamado \texttt{project}, que é responsável por garantir que o campo de velocidades seja incompressível, ou seja, que a divergência do campo seja zero ($\nabla \cdot u = 0$) \footnote{a massa do fluido permanece constante ao longo do tempo.}. Isso é importante para simular fluidos realistas, onde a massa é conservada. Este método pode ser implementado resolvendo a equação de Poisson para o componente de pressão e, em seguida, ajustando o campo de velocidades com base no gradiente resultante.
+Note que temos um novo procedimento neste passo chamado \texttt{project}, que é responsável por garantir que o campo de velocidades seja incompressível, ou seja, que a divergência do campo seja zero ($\nabla \cdot u = 0$) \footnote{A massa do fluido permanece constante ao longo do tempo.}. Isso é importante para simular fluidos realistas, onde a massa é conservada. Este método pode ser implementado resolvendo a equação de Poisson para o componente de pressão e, em seguida, ajustando o campo de velocidades com base no gradiente resultante.
 
 O procedimento \texttt{project} calcula a pressão p que seria necessária para "empurrar" o excesso de massa para fora (ou puxar a falta de massa para dentro) e, em seguida, aplica a força de pressão ($-\nabla p$) para corrigir as velocidades e pode ser implementado da seguinte maneira:
 
@@ -162,7 +162,7 @@ void project(int N, float *u, float *v, float *p, float *div) {
 \end{lstlisting}
 
 \subsubsection{Conclusão da modelagem de forma}
-Podemos concluir essa seção com a presença de uma rotina principal, que chama os passos de densidade e velocidade, atualizando o estado do fluido a cada frame \footnote{A rotina \texttt{draw\_dens} será abordada na seção de shading \ref{sec:shading}.};. 
+Podemos concluir essa seção com a presença de uma rotina principal, que chama os passos de densidade e velocidade, atualizando o estado do fluido a cada frame \footnote{A rotina \texttt{draw\_dens} será abordada na Seção \ref{sec:shading}.}.
 \begin{lstlisting}[language=C]
 void simulate(int N, float *u, float *v, float *u0, float *v0,
 float *dens, float *dens0, float diff, float visc, float dt) {
