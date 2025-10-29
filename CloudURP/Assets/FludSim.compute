@@ -187,13 +187,13 @@ void InjectKernel(uint3 id : SV_DispatchThreadID)
         float falloff = 1 - (d / injectRadius);
         
         // Combine sphere falloff with Worley + FBM pattern
-    float3 noisePos = p * 0.05;
-    float cloudNoise = cloudDensityPattern(noisePos);
+        float3 noisePos = p * 0.05;
+        float cloudNoise = cloudDensityPattern(noisePos);
 
-    // Ensure strong core density while preserving cellular variation
-    float densityShape = 0.6 + 0.4 * cloudNoise;
+        // Ensure strong core density while preserving cellular variation
+        float densityShape = 0.6 + 0.4 * cloudNoise;
 
-    float finalDensity = injectValue * falloff * densityShape;
+        float finalDensity = injectValue * falloff * densityShape;
         finalDensity = max(0.0, finalDensity);
         
         float prev = densityWrite[id];
@@ -396,3 +396,5 @@ void SubtractGradientKernel(uint3 id : SV_DispatchThreadID)
 
     velocityWrite[id] = float4(vel, 0.0);
 }
+
+

@@ -1,8 +1,5 @@
 using UnityEngine;
 using UnityEngine.Rendering;
-#if ENABLE_INPUT_SYSTEM
-using UnityEngine.InputSystem;
-#endif
 
 // FluidController: orchestrates 3D density simulation + ray-march rendering
 // Attach to a GameObject (e.g. the volume cube) and assign:
@@ -21,7 +18,7 @@ public class FluidController : MonoBehaviour
     public int diffusionIterations = 15;
     
     [Tooltip("Density decay rate over time (0 = no decay, 1 = fast decay).")]
-    [Range(0f, 5f)]
+    [Range(0f, 1f)]
     public float decayRate = 0.5f;
 
     [Header("Pressure Projection")]
