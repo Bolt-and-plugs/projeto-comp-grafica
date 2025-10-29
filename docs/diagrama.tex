@@ -1,3 +1,6 @@
+\begin{figure}[H]
+\label{fig:fluid_pipeline}
+\centering
 \begin{tikzpicture}[
     node distance=10mm and 18mm,  % Distância horizontal aumentada
     box/.style = {draw, rounded corners, minimum width=40mm, minimum height=10mm, align=center, font=\footnotesize, fill=blue!5},
@@ -46,3 +49,5 @@
 \draw [arr, dashed, faded] (step3.east) -- (sim_input);
 
 \end{tikzpicture}
+\caption{Diagrama do Pipeline de Simulação e Renderização de Fluidos Volumétricos}
+\end{figure}
