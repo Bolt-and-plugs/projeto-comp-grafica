@@ -1,18 +1,10 @@
 \section{Introdução}
 
-Em 1952, foi construído o computador MANIAC (Mathematical Analyzer, Numerical Integrator, and Computer), também conhecido como IAS. Sua criação marcou uma nova era ao prometer resolver problemas matemáticos até então considerados complexos demais ou que exigiam esforço humano excessivo. Entre os desafios abordados por esse sistema, mencionados por Dyson em \textit{Turing’s Cathedral: The Origins of the Digital Universe} \cite{dyson2012turing}, destacavam-se questões diretamente ligadas à física:
+Em 1952, o computador MANIAC (Mathematical Analyzer, Numerical Integrator, and Computer), também conhecido como IAS, foi construído, marcando uma nova era para as ciências (além de quase inaugurar uma nova) ao prometer resolver problemas matemáticos até então considerados complexos demais ou que exigiam esforço humano excessivo. Entre os desafios abordados por esse sistema, citados por Dyson et al em \textit{Turing’s Cathedral: The Origins of the Digital Universe} \cite{dyson2012turing}, destacavam-se questões diretamente ligadas à física, como: \textbf{(1)} Explosões nucleares, analisadas em microsegundos; \textbf{(2)} Ondas de choque, com variação temporal de microsegundos a minutos; \textbf{(3)} Meteorologia; textit{(4) Evolução biológica; e \textbf{(5)} Evolução estelar.
 
-\begin{enumerate}
-    \item Explosões nucleares, analisadas em microsegundos;
-    \item Ondas de choque, com variação temporal de microsegundos a minutos;
-    \item Meteorologia;
-    \item Evolução biológica;
-    \item Evolução estelar.
-\end{enumerate}
+A partir das premissas supracitadas e, especialmente, buscando compreender o papel da física na computação gráfica ao longo do tempo, este trabalho tem como foco o estudo das técnicas de simulação de ambientes, abrangendo sistemas de partículas, fluidos e terrenos e sua interação com a luz. Embora esses temas possam parecer inicialmente restritos, são fundamentais para a criação de mundos virtuais realistas e constituem a base física de praticamente todas as aplicações modernas em gráficos computacionais, desde jogos e filmes até ferramentas de visualização e modelagem científica. Faz-se ainda uma menção especial aos corpos rígidos e tecidos, igualmente relevantes, mas que extrapolam os limites temporais e conceituais definidos neste estudo.
 
-A partir desses avanços e, especialmente, buscando compreender o papel da física na computação gráfica ao longo do tempo, este trabalho tem como foco o estudo das técnicas de simulação de ambientes, abrangendo sistemas de partículas, fluidos e terrenos. Embora esses temas possam parecer inicialmente restritos, são fundamentais para a criação de mundos virtuais realistas e constituem a base física de praticamente todas as aplicações modernas em gráficos computacionais, desde jogos e filmes até ferramentas de visualização e modelagem científica. Faz-se ainda uma menção especial aos corpos rígidos e tecidos, igualmente relevantes, mas que extrapolam os limites temporais e conceituais definidos neste estudo.
-
-A trajetória histórica da computação gráfica evidencia uma relação direta entre os avanços tecnológicos e o aprimoramento dos modelos físicos que lhes dão suporte. Desde a década de 1960, o campo vem sendo moldado por esforços de traduzir fenômenos ópticos e mecânicos para o domínio digital, permitindo que luz, matéria e movimento fossem descritos matematicamente.
+A trajetória histórica da computação gráfica evidencia uma relação direta entre os avanços tecnológicos e o aprimoramento dos modelos físicos que lhes dão suporte. Desde a década de 1960, o campo vem sendo moldado por esforços de traduzir fenômenos ópticos e mecânicos para o domínio digital, permitindo que luz, matéria e movimento fossem descritos matematicamente e reproduzidos virtualmente.
 
 \subsection{Primeiros avanços na renderização e modelagem}
 
@@ -36,7 +28,4 @@ Em 2022, o \textit{Real-Time Path Tracing} tornou-se viável com os avanços das
 
 Entre 2024 e 2025, observa-se a consolidação das técnicas de \textit{Neural Rendering} e \textit{Neural Shading} em pipelines gráficos padronizados, integradas a APIs como \textit{DirectX} e \textit{Vulkan}. O surgimento do \textit{RTX Neural Radiance Cache} permitiu modelar iluminação indireta com aprendizado profundo. Paralelamente, o uso de redes neurais informadas por leis físicas (\textit{Physics-Informed Neural Networks}, PINNs) vem viabilizando simulações de fluidos e tecidos com precisão e velocidade sem precedentes.
 
-\subsection{Conclusão}
-
-Do traçado de raios proposto por Appel às renderizações neurais contemporâneas, a história da computação gráfica revela uma convergência cada vez mais próxima entre modelos físicos e técnicas computacionais. Essa interação simbiótica não apenas eleva o realismo visual, mas também redefine o papel da física como base conceitual e estrutural na criação digital de mundos virtuais.
-
+Observa-se que, do traçado de raios proposto por Appel às renderizações neurais contemporâneas, a história da computação gráfica revela uma convergência cada vez mais próxima entre modelos físicos e técnicas computacionais. Essa interação simbiótica não apenas eleva o realismo visual, mas também redefine o papel da física como base conceitual e estrutural na criação digital de mundos virtuais. Explorar-se-á, nas seções subsequentes, como esses avanços históricos se traduzem em técnicas de renderização, a fim de demonstrar a sua aplicabilidade e viabilidade.

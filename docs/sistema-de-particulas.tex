@@ -1,29 +1,20 @@
 \section{Sistemas de Partículas}
+\label{sec:sis-part}
 
-O primeiro artigo referente a modelagem de eventos chamados "nebulosos" foi escrito e publicado no ano de 1983, por William T. Reeves\cite{reeves1983}. Este paper representa a primeira aparição de um sistema de partículas, alterando a representação de primitivas anterior, como polígonos com extremidades definidas, mas como nuvens de partículas primitivas que definem seu volume (futuramente a representação Point Cloud também seria utilizada). Esse volume de partículas também não é uma entidade por si só, cada partícula tem seu *lifetime* próprio com a passagem do tempo (esta modelada por uma série de oscilações estocásticas - randômicas | ou pseudo). 
+O primeiro artigo referente a modelagem de eventos ditos nebulosos \footnote{como fluídos, poeira ou o fogo} fora publicado no ano de 1983, por William T. Reeves\cite{reeves1983}. Este documento representa a primeira aparição de um sistema de partículas, que alterava a representação de primitivas anterior (como polígonos com extremidades definidas) para nuvens de partículas que definem seu volume. Esse volume não é computado uma entidade por si só, cada partícula interna tem seu ciclo de vida próprio descritas no tempo (tempo este modelado por uma série de oscilações estocásticas - pseudo randômicas). 
 
-Este projeto deriva de ideias prévias relacionadas aos videogames (provavelmente a primeira aplicação de cg em escala), como o grandessíssimo Evans e Sutherland Flight Simulator \footnote{\href{https://www.youtube.com/watch?v=6W-qb_jHRhA}{link para o video do Flight Simulator - Evanas e Sutherland}}, que, além de ser o projeto inventor dos frame buffers (lembrem do swap buffers do opengl), iniciou (primitivamente) o processamento de explosões com um sistema simples de colisão e a tentativa de renderizar esse elemento "fuzzy" (como o fogo \footnote{Esta técnica foi empregada no filme \href{https://www.youtube.com/watch?v=x8X44NRltMM}{Star Trek II: The Wrath f Khan} - minuto 1.39 }) mas sem a aleaotiriedade esperada.
+Este projeto deriva de ideias prévias relacionadas a simuladores, que também resolviam ou simulavam ambientes físicos, como o pioneiro Evans e Sutherland \textit{Flight Simulator} \footnote{\href{https://www.youtube.com/watch?v=6W-qb_jHRhA}{link para o video do Flight Simulator - Evanas e Sutherland}}, que, além de ser o projeto inventor dos \textit{frame buffers}, iniciou o processamento de explosões com um sistema simples de colisão e posterior tentativa de renderizar esse elemento nebuloso mas sem a aleaotiriedade esperada.
 
-Para renderizar esse sistema, o seguinte pipeline é seguido: (1) novas partículas são introduzidas no sistema, (2) cada partícula recebe seus atributos individualmente, (3) toda partícula que exista no sistema depois de passar do seu tempo de vida, são removidas; (4) as partículas restantes se movem baseadas nos seus atributos dinâmicos e (5) a imagem do sistema é criada no frame buffer.
+William T. Reeves, procurando renderizar esse sistema, propôs o seguinte pipeline: (1) novas partículas são introduzidas no sistema, (2) cada partícula recebe seus atributos individualmente, (3) toda partícula que exista no sistema depois de passar do seu tempo de vida, são removidas; (4) as partículas restantes se movem baseadas nos seus atributos dinâmicos e (5) a imagem do sistema é criada no frame buffer \footnote{Esta técnica foi empregada no filme \href{https://www.youtube.com/watch?v=x8X44NRltMM}{Star Trek II: The Wrath f Khan} - minuto 1.39 }). 
 
-Este paper tratou alguns parâmetros dos sistemas de partículas:
-\begin{itemize}
-\item numero de partículas geradas (densidade): $NPartsf = MeanPartsf + Rand() \times VarPartsf \rightarrow$ media de partículas que o sistema deve ter somado a um um valor randômico de -1 a 1 * a variância de partículas desejado. 
-\item variância: o programador pode alterar a media através de alguma função qualquer, alterando o tamanho do volume.
+Neste modelo, a priori, cada nova partícula possuiria: (1) Posição inicial; (2) Velocidade e direção iniciais; (3) Tamanho inicial; (4) Cor inicial; (5) Transparência inicial; (6) Formato; (7) Tempo de vida (em frames); atributos os quais são fortemente capazes de 
+
+No entanto, como cada partícula tinha sua propriedade individual, ainda precisamos de informação sobre o sistema como um todo, o que permitiria parametrizar o evento nebuloso: 
+
+\begin{itemize}\setlength{\itemsep}{0.02em}
+  \item Número de partículas geradas (densidade): média de partículas que o sistema deve ter somado a um um valor randômico de -1 a 1 $\times$  variância de partículas desejado. 
+  \item Variância: o programador pode alterar a media através de alguma função qualquer, alterando o tamanho do volume.
 \end{itemize}
 
-Em geral, cada nova partícula possui: 
 
-\begin{enumerate}
-  \setlength{\itemsep}{0.05em}
-\item Posição inicial
-\item Velocidade e direção iniciais
-\item Tamanho inicial
-\item Cor inicial
-\item Transparência inicial
-\item Formato
-\item Tempo de vida (em frames)
-\end{enumerate}
-
-\subsection{Problemas encontrados}
-O artigo cita três problemas: (1) partículas não podem interagir com outras superfícies (2) só há interação de fato através de planos de projeção que limitam o crescimento das partículas. (3) toda partícula eh um emissor de luz, que adiciona luz para as partículas internas e externas, não sendo factível com a realidade. Para nosso sistema posteriormente discutido na seção \ref{sec:metodologia}, o principal problema desta abordagem esta em seu custo computacional, tema o qual também será abordado.
+Pode-se notar, no entanto, vários problemas que essa abordagem não trabalha. O próprio artigo cita três: (1) partículas não podem interagir com outras superfícies (malhas, por exemplo) (2) só há interação de fato através de planos de projeção que limitam o crescimento das partículas. (3) toda partícula eh um emissor de luz, que adiciona luz para as partículas internas e externas, não sendo factível com a realidade. Para nosso sistema posteriormente discutido na seção \ref{sec:metodologia}, o principal problema desta abordagem esta em seu custo computacional elevado, tema o qual também será abordado.

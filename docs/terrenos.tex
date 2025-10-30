@@ -1,9 +1,9 @@
 \section{Geração Procedural de Terrenos}
 \label{sec:terrenos}
 
-A geração procedural de terrenos é uma técnica amplamente utilizada em computação gráfica para criar ambientes naturais de forma automática e eficiente. Essa técnica é especialmente útil em jogos, simulações e visualizações onde a criação manual de terrenos seria impraticável devido à sua complexidade e escala.
+A primeira técnica a ser abordada será a geração de terrenos, amplamente utilizada em computação gráfica para criar ambientes naturais de forma automática e eficiente. Essa técnica é especialmente útil em jogos, simulações e visualizações onde a criação manual de terrenos seria impraticável devido à sua complexidade e escala.
 
-Em especial, trataremos de uma técnica bastante utilizada, o Perlin Noise, e uma variação deste, o Fractional Brownian Motion (fBm).
+Em especial, trataremos de uma técnica bastante utilizada, o Perlin Noise, e uma variação deste, o Fractional Brownian Motion (fBm), que têm aplicações expressivas em todos os outros segmentos da simulação física.
 
 \subsection{Perlin Noise}
 
@@ -33,23 +33,28 @@ Uma vez que o valor de ruído $Noise([x, y, z])$ é calculado, ele pode ser inte
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.4\textwidth]{img/donut.png}
-    \caption{Donut com textura Noise aplicada}
-    \label{fig:donut_noise}
-\end{figure}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.4\textwidth]{img/donut2.png}
-    \caption{Donut com textura Noise aplicada}
-    \label{fig:sphere_noise}
-\end{figure}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.4\textwidth]{img/donut3.png}
-    \caption{Donut com textura Noise aplicada}
-    \label{fig:cube_noise}
+    \begin{subfigure}{0.32\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{img/donut.png}
+        \caption{Donut com textura Noise}
+        \label{fig:donut_noise}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.32\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{img/donut2.png}
+        \caption{Donut com textura Noise}
+        \label{fig:sphere_noise}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.32\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{img/donut3.png}
+        \caption{Donut com textura Noise}
+        \label{fig:cube_noise}
+    \end{subfigure}
+    \caption{Donuts com textura Noise aplicada}
+    \label{fig:all_shapes_noise}
 \end{figure}
 
 A derivada do Perlin Noise, chamada de Dnoise(), é o vetor diferencial do ruído e representa a taxa de variação instantânea do ruído em cada uma das três direções do espaço. A aplicação do Dnoise() permite a criação de perturbações de superfície, influenciando, por exemplo, a normal de um objeto para simular relevo e detalhes finos.

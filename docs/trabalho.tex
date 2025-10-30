@@ -1,7 +1,7 @@
 \documentclass[12pt,a4paper]{article}
 
 % Pacotes para o português.
-\usepackage[brazil]{babel}
+\usepackage[portuguese, provide=*]{babel}
 \usepackage{graphicx}
 \usepackage{listings}
 \usepackage{xcolor}
@@ -26,6 +26,7 @@
 \usepackage{listings}
 \usepackage{xcolor}
 \usepackage{microtype}
+\usepackage{subcaption}
 
 \definecolor{codegreen}{rgb}{0,0.6,0}
 \definecolor{codegray}{rgb}{0.5,0.5,0.5}
@@ -108,17 +109,11 @@
 \newpage
 
 \input{intro.tex}
-\input{sistema-de-particulas.tex}
 \input{terrenos.tex}
+\input{sistema-de-particulas.tex}
 \input{fluidos.tex}
 
-\section{Geração Volumétrica de Nuvens em tempo real com Unity URP}
-Nesta seção, abordaremos a implementação prática de um sistema de geração volumétrica de nuvens em tempo real utilizando o Unity Universal Render Pipeline (URP), apoiando-nos nos conceitos teóricos previamente discutidos. 
-
-
-\input{objetivos.tex}
-\input{metodologia.tex}
-\input{resultados.tex}
+\input{unity-urp.tex}
 \input{conclusao.tex}
 
 \newpage

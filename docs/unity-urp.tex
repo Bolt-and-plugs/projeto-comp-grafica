@@ -1,3 +1,17 @@
+\section{Geração Volumétrica de Nuvens em tempo real com Unity URP}
+Nesta seção, abordaremos a implementação prática de um sistema de geração volumétrica de nuvens em tempo real utilizando o Unity Universal Render Pipeline (URP), apoiando-nos nos conceitos teóricos previamente discutidos. 
+
+
+\subsection{Objetivos}
+
+Este projeto tem, portanto, um foco educacional ao se utilizar uma ferramenta comum como o Unity e mostrar a viabilidade de se implementar uma simulação complexa e otimizada com GPU em tempo real, conduzindo uma experimentação de técnicas distinas, consonantemente a um aprimoramento academico dos alunos aqui presentes. Ao se desenvolver um sistema de geração volumétrica de nuvens em tempo real, esperamos alcançar os seguintes objetivos específicos:
+
+\begin{itemize}
+    \item \textbf{Implementação de técnicas de geração volumétrica:} Desenvolver e implementar técnicas avançadas de geração volumétrica de nuvens, como noise functions (Perlin, Simplex), Worley noise, e outras abordagens baseadas em shaders.
+    \item \textbf{Otimização para tempo real:} Adaptar e otimizar os algoritmos de geração volumétrica para garantir que possam ser executados em tempo real dentro do Unity URP, mantendo um equilíbrio entre qualidade visual e desempenho.
+    \item \textbf{Integração com Unity URP:} Integrar o sistema de geração volumétrica de nuvens com o Unity Universal Render Pipeline, aproveitando suas capacidades de renderização e iluminação para melhorar a aparência das nuvens.
+\end{itemize}
+
 \section{Metodologia}
 \label{sec:metodologia}
 
@@ -10,3 +24,7 @@ O \textit{pipeline} metodológico foi dividido em duas etapas principais, ambas 
 Subsequentemente, a segunda etapa consistiu na renderização deste volume dinâmico. Foi implementada a técnica de \textit{volumetric ray marching}, cuja fundamentação teórica foi apresentada na Seção 5. Um \textit{shader} customizado foi desenvolvido para marchar raios através do \textit{grid} de densidade, que é continuamente atualizado pelo \textit{Compute Shader}. Este \textit{shader} de renderização foi integrado ao URP para amostrar o volume e calcular a interação da luz (absorção e espalhamento), gerando a representação visual final das nuvens volumétricas.
 
 
+\section{Resultados}
+\label{sec:resultados}
+
+Resultados alcançados foram ok
