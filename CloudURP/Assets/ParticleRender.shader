@@ -122,7 +122,7 @@ Shader "Custom/RayMarchShader"
                     float rawDensity = SAMPLE_TEXTURE3D_LOD(_DensityTex, sampler_DensityTex, uvw, 0).r;
 
                     // Remap density to give crisper cloud edges
-                    const float densityThreshold = 0.3;
+                    const float densityThreshold = 0.05;
                     const float densitySharpness = 2.5;
                     float density = pow(saturate((rawDensity - densityThreshold) / (1.0 - densityThreshold)), densitySharpness);
 

@@ -191,7 +191,7 @@ void InjectKernel(uint3 id : SV_DispatchThreadID)
         float cloudNoise = cloudDensityPattern(noisePos);
 
         // Ensure strong core density while preserving cellular variation
-        float densityShape = 0.6 + 0.4 * cloudNoise;
+        float densityShape = cloudNoise;
 
         float finalDensity = injectValue * falloff * densityShape;
         finalDensity = max(0.0, finalDensity);

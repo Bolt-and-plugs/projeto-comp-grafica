@@ -35,10 +35,6 @@ public class FluidController : MonoBehaviour
     [Tooltip("Apply velocity uniformly across entire volume (better movement)")]
     public bool uniformVelocity = true;
 
-    [Header("Procedural Injection (Hold Space)")]
-    public float injectRadius = 20f;
-    public float injectValue = 1.0f;
-
     [Header("Generic Source (Prebaked)")]
     public bool addConstantSource = true;
     public float sourceScale = 1.0f;
