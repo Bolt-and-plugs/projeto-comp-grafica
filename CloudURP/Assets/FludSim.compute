@@ -157,7 +157,8 @@ float worley(float3 p)
 float cloudDensityPattern(float3 p)
 {
     float baseFBM = fbm(p * 0.05, 3);
-    float worleyPattern = 1.0 - worley(p * 0.1);
+
+    float worleyPattern = 1.0 - worley(p * 1);
     float detail = fbm(p * 0.2, 2) * 0.5;
 
     float density = baseFBM * worleyPattern + detail * 0.3;
@@ -187,11 +188,11 @@ void InjectKernel(uint3 id : SV_DispatchThreadID)
         float falloff = 1 - (d / injectRadius);
         
         // Combine sphere falloff with Worley + FBM pattern
-        float3 noisePos = p * 0.05;
+        float3 noisePos = p ;
         float cloudNoise = cloudDensityPattern(noisePos);
 
         // Ensure strong core density while preserving cellular variation
-        float densityShape = cloudNoise;
+        float densityShape = cloudNoise * 2;
 
         float finalDensity = injectValue * falloff * densityShape;
         finalDensity = max(0.0, finalDensity);
@@ -272,6 +273,10 @@ void DiffuseKernel(uint3 id : SV_DispatchThreadID)
 
     float initVal = initialBuffer[id];
     float val = (sumN + alpha * initVal) * rBeta;
+
+    // diffusion is rouding my clouds too much, clamp to previous value
+    float prev = bufferRead[id];
+
     bufferWrite[id] = val;
 }
 

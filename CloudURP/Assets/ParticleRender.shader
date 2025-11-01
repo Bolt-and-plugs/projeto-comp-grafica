@@ -123,7 +123,7 @@ Shader "Custom/RayMarchShader"
 
                     // Remap density to give crisper cloud edges
                     const float densityThreshold = 0.05;
-                    const float densitySharpness = 2.5;
+                    const float densitySharpness = 0.25;
                     float density = pow(saturate((rawDensity - densityThreshold) / (1.0 - densityThreshold)), densitySharpness);
 
                     if (density > 0.01)
@@ -133,7 +133,7 @@ Shader "Custom/RayMarchShader"
                         float absorb = exp(-density * _Absorption * stepSize);
                         // Cor baseada na densidade acumulada
                         float lightFactor = pow(1.0 - saturate(densityAccum * 0.15), 2.0);
-                        lightFactor = lerp(0.7, 1.0, lightFactor); // Mínimo de 70% de luz
+                        lightFactor = lerp(0.9, 1.0, lightFactor); // Mínimo de 70% de luz
                         float3 cloudColor = lerp(_DarkColor.rgb, _CloudColor.rgb, lightFactor);
                         
                         // Acumular cor
@@ -161,6 +161,9 @@ Shader "Custom/RayMarchShader"
                 
                 // Fade alpha para evitar bordas duras
                 alpha = saturate(alpha);
+
+                if (alpha < 0.01)
+                    discard;
 
                 return half4(accum, alpha);
             }
